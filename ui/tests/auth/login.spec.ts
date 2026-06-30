@@ -1,4 +1,4 @@
-import { allure } from 'allure-playwright';
+import * as allure from 'allure-js-commons';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { USERS, PASSWORD } from '../../../config/constants';
 import { MESSAGES } from '../../../config/messages';

@@ -17,4 +17,9 @@ export class BasePage {
   async waitForLoad(): Promise<void> {
     await this.page.waitForLoadState('domcontentloaded');
   }
+
+  protected toScopedSelector(selector: string): string {
+    const match = selector.match(/^getByTestId\(['"](.+)['"]\)$/);
+    return match ? `[data-test="${match[1]}"]` : selector;
+  }
 }

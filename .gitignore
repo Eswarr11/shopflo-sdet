@@ -11,3 +11,5 @@ allure-results/
 /playwright-report/
 /playwright/.cache/
 /playwright/.auth/
+my-allure-results/
+blob-report/

@@ -2,6 +2,7 @@ import { chromium, FullConfig, Browser } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 import { USERS, PASSWORD } from './config/constants';
+import { LoginPage } from './ui/pages/login.page';
 
 const AUTH_DIR = path.join(process.cwd(), '.auth');
 const FRESHNESS_MS = 24 * 60 * 60 * 1000;
@@ -49,10 +50,9 @@ async function loginAndSaveState(
   const context = await browser.newContext({ baseURL, ...CONTEXT_OPTIONS });
   const page = await context.newPage();
 
-  await page.goto(baseURL);
-  await page.locator('[data-test="username"]').fill(username);
-  await page.locator('[data-test="password"]').fill(PASSWORD);
-  await page.locator('[data-test="login-button"]').click();
+  const loginPage = new LoginPage(page);
+  await loginPage.goto();
+  await loginPage.login(username, PASSWORD);
   await page.waitForURL('**/inventory.html');
 
   await context.storageState({ path: authFile });

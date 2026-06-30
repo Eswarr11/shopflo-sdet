@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { PRODUCTS } from '../config/constants';
 import type { Cart } from '../api/schemas/cart.schema';
 
 interface CheckoutInfo {
@@ -25,4 +26,11 @@ export function buildCart(overrides: Partial<CartPayload> = {}): CartPayload {
     products: [{ productId: 1, quantity: 1 }],
     ...overrides,
   };
+}
+
+export function pickRandomProductNames(minCount = 2, maxCount?: number): string[] {
+  const allNames = Object.values(PRODUCTS).map((product) => product.name);
+  const upperBound = Math.min(maxCount ?? allNames.length, allNames.length);
+  const count = faker.number.int({ min: minCount, max: upperBound });
+  return faker.helpers.arrayElements(allNames, count);
 }

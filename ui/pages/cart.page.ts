@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import { BasePage } from './base.page';
 
 export class CartPage extends BasePage {
@@ -8,10 +8,15 @@ export class CartPage extends BasePage {
     continueShoppingButton: 'getByTestId("continue-shopping")',
     checkoutButton:         'getByTestId("checkout")',
     pageTitle:              'getByTestId("title")',
+    removeButton:           '[data-test^="remove"]',
   };
 
   constructor(page: Page) {
     super(page);
+  }
+
+  private getCartItemByName(productName: string): Locator {
+    return this.page.locator(this.SEL.cartItems, { hasText: productName });
   }
 
   async goto(): Promise<void> {
@@ -27,8 +32,8 @@ export class CartPage extends BasePage {
   }
 
   async removeItem(productName: string): Promise<void> {
-    const item = this.page.locator('.cart_item', { hasText: productName });
-    await this.actions.click(item.locator('[data-test^="remove"]'), `remove — ${productName}`);
+    const item = this.getCartItemByName(productName);
+    await this.actions.click(item.locator(this.SEL.removeButton), `remove — ${productName}`);
   }
 
   async continueShopping(): Promise<void> {

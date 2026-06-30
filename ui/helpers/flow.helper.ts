@@ -13,6 +13,20 @@ export async function addProductsToCart(
   }
 }
 
+export async function addProductFromDetailPage(
+  poManager: POManager,
+  productName: string,
+): Promise<number> {
+  const inventory = poManager.getInventoryPage();
+  await inventory.goto();
+  await inventory.clickProduct(productName);
+  const detail = poManager.getProductDetailPage();
+  const price = await detail.getProductPrice();
+  await detail.addToCart();
+  await detail.goBack();
+  return price;
+}
+
 export async function navigateToCart(
   poManager: POManager,
   productNames: string[],

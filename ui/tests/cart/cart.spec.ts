@@ -1,4 +1,4 @@
-import { allure } from 'allure-playwright';
+import * as allure from 'allure-js-commons';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { PRODUCTS, AUTH_FILES } from '../../../config/constants';
 import { addProductsToCart } from '../../helpers/flow.helper';

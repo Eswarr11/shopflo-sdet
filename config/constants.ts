@@ -24,6 +24,16 @@ export const PRODUCTS = {
   RED_TSHIRT: { name: 'Test.allTheThings() T-Shirt (Red)', price: 15.99 },
 } as const;
 
+/** Expected image filename fragment per product when images are correct (standard_user). */
+export const PRODUCT_IMAGE_SLUGS: Record<string, string> = {
+  [PRODUCTS.BACKPACK.name]: 'sauce-backpack',
+  [PRODUCTS.BIKE_LIGHT.name]: 'bike-light',
+  [PRODUCTS.BOLT_TSHIRT.name]: 'bolt-shirt',
+  [PRODUCTS.FLEECE_JACKET.name]: 'sauce-pullover',
+  [PRODUCTS.ONESIE.name]: 'red-onesie',
+  [PRODUCTS.RED_TSHIRT.name]: 'red-tatt',
+};
+
 const AUTH_DIR = path.join(process.cwd(), '.auth');
 
 export const AUTH_FILES = {

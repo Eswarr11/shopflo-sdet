@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import { BasePage } from '../base.page';
 import { CommonUtils } from '../../../helpers/common-utils';
 
@@ -6,6 +6,7 @@ export class CheckoutStepTwoPage extends BasePage {
   private readonly SEL = {
     cartItems:      '.cart_item',
     cartItemNames:  'getByTestId("inventory-item-name")',
+    cartItemPrices: 'getByTestId("inventory-item-price")',
     subtotalLabel:  'getByTestId("subtotal-label")',
     taxLabel:       'getByTestId("tax-label")',
     totalLabel:     'getByTestId("total-label")',
@@ -16,8 +17,21 @@ export class CheckoutStepTwoPage extends BasePage {
     super(page);
   }
 
+  private getSummaryItemByName(productName: string): Locator {
+    return this.page.locator(this.SEL.cartItems, { hasText: productName });
+  }
+
   async getItemNames(): Promise<string[]> {
     return this.actions.getAllTexts(this.SEL.cartItemNames, 'order summary item names');
+  }
+
+  async getItemPriceByName(productName: string): Promise<number> {
+    const item = this.getSummaryItemByName(productName);
+    const text = await this.actions.getText(
+      item.locator(this.toScopedSelector(this.SEL.cartItemPrices)),
+      `summary price — ${productName}`,
+    );
+    return CommonUtils.normalizePrice(text ?? '');
   }
 
   async getSubtotal(): Promise<number> {

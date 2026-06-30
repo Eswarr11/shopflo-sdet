@@ -1,6 +1,6 @@
-import { allure } from 'allure-playwright';
+import * as allure from 'allure-js-commons';
 import { test, expect } from '../../../fixtures/ui.fixture';
-import { USERS, PASSWORD, AUTH_FILES } from '../../../config/constants';
+import { USERS, PASSWORD, AUTH_FILES, PRODUCT_IMAGE_SLUGS } from '../../../config/constants';
 import { MESSAGES } from '../../../config/messages';
 
 test.describe('User type behaviors', () => {
@@ -45,7 +45,7 @@ test.describe('User type behaviors', () => {
   test.describe('problem_user', () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
-    test('product images are broken (naturalWidth = 0)', async ({ page, poManager }) => {
+    test('product images are mismatched for product names', async ({ page, poManager }) => {
       await allure.feature('Authentication');
       await allure.story('User Types');
       await allure.step('Log in as problem_user and open inventory', async () => {
@@ -54,13 +54,11 @@ test.describe('User type behaviors', () => {
         await login.login(USERS.PROBLEM, PASSWORD);
         await page.waitForURL(/inventory/);
       });
-      await allure.step('Verify at least one product image has naturalWidth = 0', async () => {
+      await allure.step('Verify at least one product shows the wrong image', async () => {
         const inventory = poManager.getInventoryPage();
         expect(await inventory.isPageTitleVisible()).toBe(true);
-        await expect.poll(async () => {
-          const widths = await inventory.getProductImageNaturalWidths();
-          return widths.filter((w) => w === 0).length;
-        }, { timeout: 10_000 }).toBeGreaterThan(0);
+        const mismatches = await inventory.getMismatchedProductImageCount(PRODUCT_IMAGE_SLUGS);
+        expect(mismatches).toBeGreaterThan(0);
       });
     });
   });
