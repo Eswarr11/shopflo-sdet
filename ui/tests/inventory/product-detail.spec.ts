@@ -10,7 +10,7 @@ test.describe('Product detail page', () => {
     await allure.story('Product Detail');
   });
 
-  test('clicking product name opens detail page with all elements visible', { tag: '@smoke' }, async ({ page, poManager }) => {
+  test('Verify Product Detail Page Elements Visible', { tag: '@smoke' }, async ({ page, poManager }) => {
     await allure.step('Open product detail page from inventory', async () => {
       const inventory = poManager.getInventoryPage();
       await inventory.goto();
@@ -24,7 +24,7 @@ test.describe('Product detail page', () => {
     });
   });
 
-  test('product detail shows correct name and price', async ({ poManager }) => {
+  test('Verify Product Detail Shows Correct Name and Price', async ({ poManager }) => {
     await allure.step('Verify product name, price, and description on detail page', async () => {
       const inventory = poManager.getInventoryPage();
       await inventory.goto();
@@ -36,7 +36,7 @@ test.describe('Product detail page', () => {
     });
   });
 
-  test('add to cart from detail page increments badge and shows remove button', async ({ poManager }) => {
+  test('Verify Add to Cart From Product Detail Page', async ({ poManager }) => {
     await allure.step('Add product from detail page and verify cart state', async () => {
       const inventory = poManager.getInventoryPage();
       await inventory.goto();
@@ -50,7 +50,7 @@ test.describe('Product detail page', () => {
     });
   });
 
-  test('back button returns to inventory with all products visible', async ({ page, poManager }) => {
+  test('Verify Back Button Returns to Inventory', async ({ page, poManager }) => {
     await allure.step('Navigate back from detail page to inventory', async () => {
       const inventory = poManager.getInventoryPage();
       await inventory.goto();

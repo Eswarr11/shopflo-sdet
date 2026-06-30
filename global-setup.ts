@@ -2,15 +2,12 @@ import { chromium, FullConfig, Browser } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 import { USERS, PASSWORD } from './config/constants';
+import { LoginPage } from './ui/pages/login.page';
 
 const AUTH_DIR = path.join(process.cwd(), '.auth');
 const FRESHNESS_MS = 24 * 60 * 60 * 1000;
-
-const LOGIN_SEL = {
-  username:    '//input[@data-test="username"]',
-  password:    '//input[@data-test="password"]',
-  loginButton: '//input[@data-test="login-button"]',
-};
+const SETUP_TIMEOUT_MS = 60_000;
+const PERFORMANCE_GLITCH_TIMEOUT_MS = 90_000;
 
 const AUTH_USERS = [
   USERS.STANDARD,
@@ -37,12 +34,20 @@ async function verifyAuthFile(
   baseURL: string,
   authFile: string,
 ): Promise<boolean> {
-  const context = await browser.newContext({ baseURL, storageState: authFile });
+  const context = await browser.newContext({ baseURL });
   const page = await context.newPage();
-  await page.goto('/inventory.html');
-  const valid = page.url().includes('inventory.html');
-  await context.close();
-  return valid;
+  page.setDefaultTimeout(SETUP_TIMEOUT_MS);
+  page.setDefaultNavigationTimeout(SETUP_TIMEOUT_MS);
+
+  try {
+    await page.goto('/inventory.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForURL(/inventory\.html/, { timeout: 15_000 });
+    return true;
+  } catch {
+    return false;
+  } finally {
+    await context.close();
+  }
 }
 
 async function loginAndSaveState(
@@ -51,18 +56,30 @@ async function loginAndSaveState(
   username: string,
   authFile: string,
 ): Promise<void> {
+  const inventoryTimeout = username === USERS.PERFORMANCE_GLITCH
+    ? PERFORMANCE_GLITCH_TIMEOUT_MS
+    : SETUP_TIMEOUT_MS;
+
   const context = await browser.newContext({ baseURL });
   const page = await context.newPage();
+  page.setDefaultTimeout(inventoryTimeout);
+  page.setDefaultNavigationTimeout(inventoryTimeout);
 
-  await page.goto(baseURL);
-  await page.locator(LOGIN_SEL.username).fill(username);
-  await page.locator(LOGIN_SEL.password).fill(PASSWORD);
-  await page.locator(LOGIN_SEL.loginButton).click();
-  await page.waitForURL('**/inventory.html');
+  try {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(username, PASSWORD);
+    await page.waitForURL(/inventory\.html/, { timeout: inventoryTimeout });
 
-  await context.storageState({ path: authFile });
-  console.log(`[Setup] Auth saved for ${username}`);
-  await context.close();
+    await context.storageState({ path: authFile });
+    console.log(`[Setup] Auth saved for ${username}`);
+  } catch (error) {
+    throw new Error(
+      `[Setup] Login failed for ${username}: ${(error as Error).message}`,
+    );
+  } finally {
+    await context.close();
+  }
 }
 
 function isApiOnlyRun(): boolean {
@@ -103,17 +120,19 @@ async function globalSetup(config: FullConfig): Promise<void> {
 
   const browser = await chromium.launch({ headless: true });
 
-  for (const username of AUTH_USERS) {
-    const authFile = path.join(AUTH_DIR, `${username}.json`);
-    if (isAuthFileValid(authFile) && await verifyAuthFile(browser, baseURL, authFile)) {
-      console.log(`[Setup] Auth file fresh for ${username}, skipping login`);
-      continue;
+  try {
+    for (const username of AUTH_USERS) {
+      const authFile = path.join(AUTH_DIR, `${username}.json`);
+      if (isAuthFileValid(authFile) && await verifyAuthFile(browser, baseURL, authFile)) {
+        console.log(`[Setup] Auth file fresh for ${username}, skipping login`);
+        continue;
+      }
+      console.log(`[Setup] Logging in as ${username}`);
+      await loginAndSaveState(browser, baseURL, username, authFile);
     }
-    console.log(`[Setup] Logging in as ${username}`);
-    await loginAndSaveState(browser, baseURL, username, authFile);
+  } finally {
+    await browser.close();
   }
-
-  await browser.close();
 }
 
 export default globalSetup;

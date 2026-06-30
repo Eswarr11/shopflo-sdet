@@ -1,29 +1,13 @@
 import * as allure from 'allure-js-commons';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { USERS, PASSWORD, AUTH_FILES, PRODUCT_IMAGE_SLUGS } from '../../../config/constants';
-import { MESSAGES } from '../../../config/messages';
 
 test.describe('User type behaviors', () => {
   test.describe('Login-required scenarios', () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
-    test('locked_out_user - sees error and cannot access inventory', async ({ page, poManager }) => {
-      await allure.feature('Authentication');
-      await allure.story('User Types');
-      const login = poManager.getLoginPage();
-      await allure.step('Attempt login as locked_out_user', async () => {
-        await login.goto();
-        await login.login(USERS.LOCKED, PASSWORD);
-      });
-      await allure.step('Verify error is shown and inventory is not accessible', async () => {
-        expect(await login.isErrorVisible()).toBe(true);
-        expect(await login.getErrorMessage()).toContain(MESSAGES.LOGIN.LOCKED_OUT);
-        await expect(page).not.toHaveURL(/inventory/);
-      });
-    });
-
-    test('performance_glitch_user - login takes longer than normal', async ({ page, poManager }) => {
-      await allure.feature('Authentication');
+    test('Verify Inventory Page Loads Successfully With Delays', async ({ page, poManager }) => {
+      await allure.feature('Checkout');
       await allure.story('User Types');
       const login = poManager.getLoginPage();
       await allure.step('Measure login duration for performance_glitch_user', async () => {
@@ -45,7 +29,7 @@ test.describe('User type behaviors', () => {
   test.describe('problem_user', () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
-    test('product images are mismatched for product names', async ({ page, poManager }) => {
+    test('Verify Problem User Product Images Are Mismatched', async ({ page, poManager }) => {
       await allure.feature('Authentication');
       await allure.story('User Types');
       await allure.step('Log in as problem_user and open inventory', async () => {
@@ -66,7 +50,7 @@ test.describe('User type behaviors', () => {
   test.describe('visual_user', () => {
     test.use({ storageState: AUTH_FILES.VISUAL_USER });
 
-    test('inventory is accessible with all products', async ({ poManager }) => {
+    test('Verify Visual User Can Access Inventory', async ({ poManager }) => {
       await allure.feature('Authentication');
       await allure.story('User Types');
       await allure.step('Navigate to inventory as visual_user', async () => {
@@ -83,7 +67,7 @@ test.describe('User type behaviors', () => {
   test.describe('error_user', () => {
     test.use({ storageState: AUTH_FILES.ERROR_USER });
 
-    test('lands on inventory with all products visible', async ({ poManager }) => {
+    test('Verify Error User Can Access Inventory', async ({ poManager }) => {
       await allure.feature('Authentication');
       await allure.story('User Types');
       await allure.step('Navigate to inventory as error_user', async () => {

@@ -13,7 +13,7 @@ test.describe('Login', () => {
   });
 
   test.describe('Positive', () => {
-    test('standard_user with valid credentials lands on inventory page', { tag: '@smoke' }, async ({ page, poManager }) => {
+    test('Verify Standard User Can Access Inventory After Login', { tag: '@smoke' }, async ({ page, poManager }) => {
       await allure.severity('critical');
       await allure.step('Log in with standard_user credentials', async () => {
         await poManager.getLoginPage().login(USERS.STANDARD, PASSWORD);
@@ -28,7 +28,7 @@ test.describe('Login', () => {
   });
 
   test.describe('Negative', () => {
-    test('locked_out_user sees locked-out error and stays on login page', async ({ page, poManager }) => {
+    test('Verify Locked-Out User Cannot Log In', async ({ page, poManager }) => {
       await allure.severity('normal');
       const loginPage = poManager.getLoginPage();
       await allure.step('Attempt login with locked_out_user', async () => {
@@ -41,7 +41,7 @@ test.describe('Login', () => {
       });
     });
 
-    test('wrong password shows credentials-mismatch error', async ({ page, poManager }) => {
+    test('Verify Wrong Password Shows Credentials Error', async ({ page, poManager }) => {
       const loginPage = poManager.getLoginPage();
       await allure.step('Attempt login with wrong password', async () => {
         await loginPage.login(USERS.STANDARD, 'wrong_password');
@@ -53,7 +53,7 @@ test.describe('Login', () => {
       });
     });
 
-    test('empty username field shows "Username is required" error', async ({ page, poManager }) => {
+    test('Verify Empty Username Shows Required Error', async ({ page, poManager }) => {
       const loginPage = poManager.getLoginPage();
       await allure.step('Submit login with empty username', async () => {
         await loginPage.login('', PASSWORD);
@@ -65,7 +65,7 @@ test.describe('Login', () => {
       });
     });
 
-    test('empty password field shows "Password is required" error', async ({ page, poManager }) => {
+    test('Verify Empty Password Shows Required Error', async ({ page, poManager }) => {
       const loginPage = poManager.getLoginPage();
       await allure.step('Submit login with empty password', async () => {
         await loginPage.login(USERS.STANDARD, '');
@@ -77,7 +77,7 @@ test.describe('Login', () => {
       });
     });
 
-    test('both fields empty shows username-required error (username validated first)', async ({ page, poManager }) => {
+    test('Verify Both Fields Empty Shows Username Required First', async ({ page, poManager }) => {
       const loginPage = poManager.getLoginPage();
       await allure.step('Submit login with both fields empty', async () => {
         await loginPage.login('', '');

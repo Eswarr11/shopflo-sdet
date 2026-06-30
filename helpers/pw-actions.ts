@@ -12,7 +12,7 @@ export class PwActions {
     if (typeof selector !== 'string') return selector;
 
     const testIdMatch = selector.match(/^getByTestId\(['"](.+)['"]\)$/);
-    if (testIdMatch) return this.page.getByTestId(testIdMatch[1]);
+    if (testIdMatch) return this.page.locator(`[data-test="${testIdMatch[1]}"]`);
 
     const labelMatch = selector.match(/^getByLabel\(['"](.+)['"]\)$/);
     if (labelMatch) return this.page.getByLabel(labelMatch[1]);
@@ -129,6 +129,12 @@ export class PwActions {
     const visible = await this.getLocator(selector).isVisible();
     logger.info(`"${description}" is ${visible ? 'visible' : 'not visible'}`);
     return visible;
+  }
+
+  async isEditable(selector: string | Locator, description = 'element'): Promise<boolean> {
+    const editable = await this.getLocator(selector).isEditable();
+    logger.info(`"${description}" is ${editable ? 'editable' : 'not editable'}`);
+    return editable;
   }
 
   async waitForVisible(selector: string | Locator, description = 'element', timeout = 10000): Promise<void> {

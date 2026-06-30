@@ -13,6 +13,8 @@ export class InventoryPage extends BasePage {
     productPrices: 'getByTestId("inventory-item-price")',
     pageTitle:    'getByTestId("title")',
     itemActionButton: 'button',
+    addToCartButton: '[data-test^="add-to-cart"]',
+    removeButton: '[data-test^="remove"]',
     productImage: 'img',
   };
 
@@ -117,5 +119,15 @@ export class InventoryPage extends BasePage {
 
   async goToCart(): Promise<void> {
     await this.header.goToCart();
+  }
+
+  async isAddToCartShownForProduct(productName: string): Promise<boolean> {
+    const item = this.getProductItemByName(productName);
+    return this.actions.isVisible(item.locator(this.SEL.addToCartButton), `add to cart — ${productName}`);
+  }
+
+  async isRemoveShownForProduct(productName: string): Promise<boolean> {
+    const item = this.getProductItemByName(productName);
+    return this.actions.isVisible(item.locator(this.SEL.removeButton), `remove — ${productName}`);
   }
 }

@@ -14,7 +14,7 @@ test.describe('Product Sorting', () => {
     expect(await inventory.getProductCount()).toBe(6);
   });
 
-  test('sort Name A to Z', async ({ poManager }) => {
+  test('Verify Product Sort Name A to Z', async ({ poManager }) => {
     await allure.step('Sort products A to Z and verify order', async () => {
       const inventory = poManager.getInventoryPage();
       await inventory.sortBy('az');
@@ -24,7 +24,7 @@ test.describe('Product Sorting', () => {
     });
   });
 
-  test('sort Name Z to A', async ({ poManager }) => {
+  test('Verify Product Sort Name Z to A', async ({ poManager }) => {
     await allure.step('Sort products Z to A and verify order', async () => {
       const inventory = poManager.getInventoryPage();
       await inventory.sortBy('za');
@@ -34,7 +34,7 @@ test.describe('Product Sorting', () => {
     });
   });
 
-  test('sort Price low to high', async ({ poManager }) => {
+  test('Verify Product Sort Price Low to High', async ({ poManager }) => {
     await allure.step('Sort products by price low to high', async () => {
       const inventory = poManager.getInventoryPage();
       await inventory.sortBy('lohi');
@@ -46,7 +46,7 @@ test.describe('Product Sorting', () => {
     });
   });
 
-  test('sort Price high to low', async ({ poManager }) => {
+  test('Verify Product Sort Price High to Low', async ({ poManager }) => {
     await allure.step('Sort products by price high to low', async () => {
       const inventory = poManager.getInventoryPage();
       await inventory.sortBy('hilo');

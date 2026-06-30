@@ -12,7 +12,7 @@ test.describe('Order summary accuracy', () => {
     await allure.story('Order Summary');
   });
 
-  test('subtotal matches sum of added product prices', async ({ page, poManager }) => {
+  test('Verify Order Summary Subtotal Matches Product Prices', async ({ page, poManager }) => {
     await allure.step('Navigate to checkout step two with two products', async () => {
       await navigateToCheckoutStepTwo(
         page,
@@ -35,7 +35,7 @@ test.describe('Order summary accuracy', () => {
     });
   });
 
-  test('total equals subtotal + tax', async ({ page, poManager }) => {
+  test('Verify Order Total Equals Subtotal Plus Tax', async ({ page, poManager }) => {
     await allure.step('Navigate to checkout step two with one product', async () => {
       await navigateToCheckoutStepTwo(
         page,

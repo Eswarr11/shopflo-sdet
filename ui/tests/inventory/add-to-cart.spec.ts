@@ -12,13 +12,13 @@ test.describe('Inventory — Add / Remove from Cart', () => {
   });
 
   test.describe('Positive', () => {
-    test('cart badge starts at 0 before any item is added', async ({ poManager }) => {
+    test('Verify Cart Badge Starts at Zero', async ({ poManager }) => {
       await allure.step('Verify cart badge count is zero', async () => {
         expect(await poManager.getInventoryPage().getCartBadgeCount()).toBe(0);
       });
     });
 
-    test('adding one product increments badge to 1', { tag: '@smoke' }, async ({ poManager }) => {
+    test('Verify Adding One Product Updates Cart Badge', { tag: '@smoke' }, async ({ poManager }) => {
       await allure.severity('critical');
       await allure.step('Add backpack to cart and verify badge shows 1', async () => {
         const inventory = poManager.getInventoryPage();
@@ -27,7 +27,7 @@ test.describe('Inventory — Add / Remove from Cart', () => {
       });
     });
 
-    test('adding three products shows badge count 3', async ({ poManager }) => {
+    test('Verify Adding Three Products Updates Cart Badge', async ({ poManager }) => {
       await allure.step('Add three products and verify badge shows 3', async () => {
         const inventory = poManager.getInventoryPage();
         await inventory.addToCartByName(PRODUCTS.BACKPACK.name);
@@ -37,7 +37,7 @@ test.describe('Inventory — Add / Remove from Cart', () => {
       });
     });
 
-    test('removing a product decrements badge count', async ({ poManager }) => {
+    test('Verify Removing Product Decrements Cart Badge', async ({ poManager }) => {
       await allure.step('Add two products, remove one, verify badge shows 1', async () => {
         const inventory = poManager.getInventoryPage();
         await inventory.addToCartByName(PRODUCTS.BACKPACK.name);
@@ -49,7 +49,7 @@ test.describe('Inventory — Add / Remove from Cart', () => {
   });
 
   test.describe('Negative', () => {
-    test('cart badge is absent (not rendered) when zero items in cart', async ({ poManager }) => {
+    test('Verify Cart Badge Hidden When Cart Empty', async ({ poManager }) => {
       await allure.step('Verify cart badge is not visible when cart is empty', async () => {
         expect(await poManager.getInventoryPage().isCartBadgeVisible()).toBe(false);
       });

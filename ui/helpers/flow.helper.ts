@@ -63,6 +63,12 @@ export async function navigateToCheckoutStepTwo(
   return poManager.getCheckoutStepTwoPage();
 }
 
+export async function openBurgerMenuAndReset(poManager: POManager): Promise<void> {
+  await poManager.getHeader().openBurgerMenu();
+  await poManager.getBurgerMenu().clickResetAppState();
+  await poManager.getBurgerMenu().close();
+}
+
 export async function assertInventoryLoaded(
   poManager: POManager,
   expectedCount = 6,

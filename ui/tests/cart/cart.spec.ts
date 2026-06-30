@@ -10,7 +10,7 @@ test.describe('Cart operations', () => {
     await allure.feature('Cart');
   });
 
-  test('added products appear in cart', { tag: '@smoke' }, async ({ poManager }) => {
+  test('Verify Added Products Appear in Cart', { tag: '@smoke' }, async ({ poManager }) => {
     await allure.story('Cart Items');
     await allure.step('Add two products and open cart', async () => {
       await addProductsToCart(poManager, [PRODUCTS.BACKPACK.name, PRODUCTS.BIKE_LIGHT.name]);
@@ -27,7 +27,7 @@ test.describe('Cart operations', () => {
     });
   });
 
-  test('removing item from cart updates count', async ({ poManager }) => {
+  test('Verify Removing Item Updates Cart Count', async ({ poManager }) => {
     await allure.story('Remove Item');
     await allure.step('Add two products and remove one from cart', async () => {
       await addProductsToCart(poManager, [PRODUCTS.BACKPACK.name, PRODUCTS.BOLT_TSHIRT.name]);
@@ -42,7 +42,7 @@ test.describe('Cart operations', () => {
     });
   });
 
-  test('continue shopping returns to inventory with products visible', async ({ page, poManager }) => {
+  test('Verify Continue Shopping Returns to Inventory', async ({ page, poManager }) => {
     await allure.story('Continue Shopping');
     await allure.step('Open cart and click continue shopping', async () => {
       await poManager.getInventoryPage().goto();
@@ -59,7 +59,7 @@ test.describe('Cart operations', () => {
     });
   });
 
-  test('empty cart shows title and no items', async ({ poManager }) => {
+  test('Verify Empty Cart Shows No Items', async ({ poManager }) => {
     await allure.story('Empty Cart');
     await allure.step('Navigate to empty cart page', async () => {
       await poManager.getCartPage().goto();

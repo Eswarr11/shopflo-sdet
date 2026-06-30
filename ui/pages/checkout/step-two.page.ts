@@ -11,6 +11,7 @@ export class CheckoutStepTwoPage extends BasePage {
     taxLabel:       'getByTestId("tax-label")',
     totalLabel:     'getByTestId("total-label")',
     finishButton:   'getByTestId("finish")',
+    cancelButton:   'getByTestId("cancel")',
   };
 
   constructor(page: Page) {
@@ -51,6 +52,10 @@ export class CheckoutStepTwoPage extends BasePage {
 
   async finish(): Promise<void> {
     await this.actions.click(this.SEL.finishButton, 'finish button');
+  }
+
+  async cancel(): Promise<void> {
+    await this.actions.click(this.SEL.cancelButton, 'cancel button');
   }
 
   async isFinishButtonVisible(): Promise<boolean> {
