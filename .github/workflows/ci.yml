@@ -157,7 +157,7 @@ jobs:
           merge-multiple: true
 
       - name: Merge Playwright reports
-        run: npx playwright merge-reports --reporter html ./all-blob-reports
+        run: npx playwright merge-reports --config playwright.merge.config.ts ./all-blob-reports
         continue-on-error: true
 
       - name: Generate Allure report

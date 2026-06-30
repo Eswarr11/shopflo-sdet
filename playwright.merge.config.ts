@@ -1,5 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  reporter: [['html', { outputFolder: 'reports/playwright-report', open: 'never' }]],
+  // Normalize paths when merging blobs from host (ubuntu-latest) and container jobs.
+  testDir: '.',
+  reporter: [['html', { outputFolder: 'playwright-report', open: 'never' }]],
 });
