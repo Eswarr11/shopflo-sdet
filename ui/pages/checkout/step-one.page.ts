@@ -4,11 +4,11 @@ import { BasePage } from '../base.page';
 export class CheckoutStepOnePage extends BasePage {
   private readonly SEL = {
     firstNameInput: 'getByTestId("firstName")',
-    lastNameInput:  'getByTestId("lastName")',
-    zipCodeInput:   'getByTestId("postalCode")',
+    lastNameInput: 'getByTestId("lastName")',
+    zipCodeInput: 'getByTestId("postalCode")',
     continueButton: 'getByTestId("continue")',
-    cancelButton:   'getByTestId("cancel")',
-    errorMessage:   'getByTestId("error")',
+    cancelButton: 'getByTestId("cancel")',
+    errorMessage: 'getByTestId("error")',
   };
 
   constructor(page: Page) {

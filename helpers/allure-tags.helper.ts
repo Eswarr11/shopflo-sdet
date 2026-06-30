@@ -11,10 +11,7 @@ const SEVERITY_MAP: Record<CaseSeverity, AllureSeverity> = {
   Low: 'minor',
 };
 
-export async function setAllureTags(
-  severity: CaseSeverity,
-  priority: CasePriority,
-): Promise<void> {
+export async function setAllureTags(severity: CaseSeverity, priority: CasePriority): Promise<void> {
   await allure.severity(SEVERITY_MAP[severity]);
   await allure.label('priority', priority);
 }

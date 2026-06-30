@@ -3,10 +3,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 function hasAllureResults(dir) {
-  return (
-    fs.existsSync(dir)
-    && fs.readdirSync(dir).some((file) => file.endsWith('-result.json'))
-  );
+  return fs.existsSync(dir) && fs.readdirSync(dir).some((file) => file.endsWith('-result.json'));
 }
 
 function collectAllureInputs() {

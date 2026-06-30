@@ -3,12 +3,12 @@ import { BasePage } from './base.page';
 
 export class CartPage extends BasePage {
   private readonly SEL = {
-    cartItems:              '.cart_item',
-    cartItemNames:          'getByTestId("inventory-item-name")',
+    cartItems: '.cart_item',
+    cartItemNames: 'getByTestId("inventory-item-name")',
     continueShoppingButton: 'getByTestId("continue-shopping")',
-    checkoutButton:         'getByTestId("checkout")',
-    pageTitle:              'getByTestId("title")',
-    removeButton:           '[data-test^="remove"]',
+    checkoutButton: 'getByTestId("checkout")',
+    pageTitle: 'getByTestId("title")',
+    removeButton: '[data-test^="remove"]',
   };
 
   constructor(page: Page) {

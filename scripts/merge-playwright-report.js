@@ -2,13 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-function hasBlobZips(dir) {
-  return (
-    fs.existsSync(dir)
-    && fs.readdirSync(dir).some((file) => file.endsWith('.zip'))
-  );
-}
-
 function collectBlobZips() {
   const zipFiles = [];
   const blobDirs = [

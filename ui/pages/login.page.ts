@@ -3,10 +3,10 @@ import { BasePage } from './base.page';
 
 export class LoginPage extends BasePage {
   private readonly SEL = {
-    username:    'getByTestId("username")',
-    password:    'getByTestId("password")',
+    username: 'getByTestId("username")',
+    password: 'getByTestId("password")',
     loginButton: 'getByTestId("login-button")',
-    error:       'getByTestId("error")',
+    error: 'getByTestId("error")',
   };
 
   constructor(page: Page) {

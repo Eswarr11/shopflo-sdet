@@ -33,7 +33,7 @@ apiClient.interceptors.response.use(
     const data = JSON.stringify(error.response?.data);
     logger.error(`API Error: ${status} ${url} — ${data}`);
     return Promise.reject(error);
-  }
+  },
 );
 
 export { apiClient };

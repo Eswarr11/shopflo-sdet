@@ -26,16 +26,19 @@ test.describe('Verify Checkout Completion for Problem User', { tag: '@regression
 
     const stepOne = poManager.getCheckoutStepOnePage();
 
-    await allure.step('Verify Last Name field is editable and fill checkout information', async () => {
-      expect(await stepOne.isLastNameEditable()).toBe(true);
-      await stepOne.fillShippingInfo(
-        checkoutInfo.firstName,
-        checkoutInfo.lastName,
-        checkoutInfo.zipCode,
-      );
-      await stepOne.continue();
-      await expect(page).toHaveURL(/checkout-step-two/);
-    });
+    await allure.step(
+      'Verify Last Name field is editable and fill checkout information',
+      async () => {
+        expect(await stepOne.isLastNameEditable()).toBe(true);
+        await stepOne.fillShippingInfo(
+          checkoutInfo.firstName,
+          checkoutInfo.lastName,
+          checkoutInfo.zipCode,
+        );
+        await stepOne.continue();
+        await expect(page).toHaveURL(/checkout-step-two/);
+      },
+    );
 
     await allure.step('Complete purchase from order overview', async () => {
       const stepTwo = poManager.getCheckoutStepTwoPage();

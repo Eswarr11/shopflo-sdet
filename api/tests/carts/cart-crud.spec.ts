@@ -29,7 +29,10 @@ test.describe('Cart CRUD — Positive Cases', { tag: '@regression' }, () => {
     const payload = buildCart({
       userId: 3,
       date: '2024-06-15',
-      products: [{ productId: 2, quantity: 1 }, { productId: 8, quantity: 3 }],
+      products: [
+        { productId: 2, quantity: 1 },
+        { productId: 8, quantity: 3 },
+      ],
     });
     const res = await carts.update(1, payload);
     expectSuccessStatus(res.status);

@@ -40,12 +40,7 @@ test.describe('Order summary accuracy', { tag: '@regression' }, () => {
   test('Verify Order Total Equals Subtotal Plus Tax', async ({ page, poManager }) => {
     await setAllureTags('High', 'Medium');
     await allure.step('Navigate to checkout step two with one product', async () => {
-      await navigateToCheckoutStepTwo(
-        page,
-        poManager,
-        [PRODUCTS.ONESIE.name],
-        buildCheckoutInfo(),
-      );
+      await navigateToCheckoutStepTwo(page, poManager, [PRODUCTS.ONESIE.name], buildCheckoutInfo());
     });
     const stepTwo = poManager.getCheckoutStepTwoPage();
 

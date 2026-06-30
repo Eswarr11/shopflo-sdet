@@ -78,7 +78,11 @@ export class PwActions {
     }
   }
 
-  async clearAndFill(selector: string | Locator, value: string, description = 'field'): Promise<void> {
+  async clearAndFill(
+    selector: string | Locator,
+    value: string,
+    description = 'field',
+  ): Promise<void> {
     logger.info(`Clearing and filling "${value}" into: ${description}`);
     try {
       const locator = this.getLocator(selector);
@@ -91,7 +95,11 @@ export class PwActions {
     }
   }
 
-  async selectOption(selector: string | Locator, value: string, description = 'dropdown'): Promise<void> {
+  async selectOption(
+    selector: string | Locator,
+    value: string,
+    description = 'dropdown',
+  ): Promise<void> {
     logger.info(`Selecting option "${value}" in: ${description}`);
     await this.getLocator(selector).selectOption(value);
     logger.info(`Selected "${value}" in: ${description}`);
@@ -105,7 +113,11 @@ export class PwActions {
     return text;
   }
 
-  async getAttributeValue(selector: string | Locator, attribute: string, description = 'element'): Promise<string | null> {
+  async getAttributeValue(
+    selector: string | Locator,
+    attribute: string,
+    description = 'element',
+  ): Promise<string | null> {
     const value = await this.getLocator(selector).getAttribute(attribute);
     logger.info(`Attribute "${attribute}" of "${description}": "${value}"`);
     return value;
@@ -137,7 +149,11 @@ export class PwActions {
     return editable;
   }
 
-  async waitForVisible(selector: string | Locator, description = 'element', timeout = 10000): Promise<void> {
+  async waitForVisible(
+    selector: string | Locator,
+    description = 'element',
+    timeout = 10000,
+  ): Promise<void> {
     logger.info(`Waiting for "${description}" to be visible`);
     await this.getLocator(selector).waitFor({ state: 'visible', timeout });
     logger.info(`"${description}" is now visible`);

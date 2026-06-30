@@ -4,14 +4,14 @@ import { CommonUtils } from '../../../helpers/common-utils';
 
 export class CheckoutStepTwoPage extends BasePage {
   private readonly SEL = {
-    cartItems:      '.cart_item',
-    cartItemNames:  'getByTestId("inventory-item-name")',
+    cartItems: '.cart_item',
+    cartItemNames: 'getByTestId("inventory-item-name")',
     cartItemPrices: 'getByTestId("inventory-item-price")',
-    subtotalLabel:  'getByTestId("subtotal-label")',
-    taxLabel:       'getByTestId("tax-label")',
-    totalLabel:     'getByTestId("total-label")',
-    finishButton:   'getByTestId("finish")',
-    cancelButton:   'getByTestId("cancel")',
+    subtotalLabel: 'getByTestId("subtotal-label")',
+    taxLabel: 'getByTestId("tax-label")',
+    totalLabel: 'getByTestId("total-label")',
+    finishButton: 'getByTestId("finish")',
+    cancelButton: 'getByTestId("cancel")',
   };
 
   constructor(page: Page) {

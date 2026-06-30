@@ -3,8 +3,8 @@ import { BasePage } from '../base.page';
 
 export class CheckoutCompletePage extends BasePage {
   private readonly SEL = {
-    successHeader:  'getByTestId("complete-header")',
-    successText:    'getByTestId("complete-text")',
+    successHeader: 'getByTestId("complete-header")',
+    successText: 'getByTestId("complete-text")',
     backHomeButton: 'getByTestId("back-to-products")',
   };
 

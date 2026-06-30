@@ -11,7 +11,7 @@ export class InventoryPage extends BasePage {
     productItems: '.inventory_item',
     productNames: 'getByTestId("inventory-item-name")',
     productPrices: 'getByTestId("inventory-item-price")',
-    pageTitle:    'getByTestId("title")',
+    pageTitle: 'getByTestId("title")',
     itemActionButton: 'button',
     addToCartButton: '[data-test^="add-to-cart"]',
     removeButton: '[data-test^="remove"]',
@@ -37,12 +37,18 @@ export class InventoryPage extends BasePage {
 
   async addToCartByName(productName: string): Promise<void> {
     const item = this.getProductItemByName(productName);
-    await this.actions.click(item.locator(this.SEL.itemActionButton), `Add to cart — ${productName}`);
+    await this.actions.click(
+      item.locator(this.SEL.itemActionButton),
+      `Add to cart — ${productName}`,
+    );
   }
 
   async removeFromCartByName(productName: string): Promise<void> {
     const item = this.getProductItemByName(productName);
-    await this.actions.click(item.locator(this.SEL.itemActionButton), `Remove from cart — ${productName}`);
+    await this.actions.click(
+      item.locator(this.SEL.itemActionButton),
+      `Remove from cart — ${productName}`,
+    );
   }
 
   async getProductNames(): Promise<string[]> {
@@ -71,17 +77,22 @@ export class InventoryPage extends BasePage {
     return this.header.isCartBadgeVisible();
   }
 
-  async getMismatchedProductImageCount(expectedSlugByName: Record<string, string>): Promise<number> {
+  async getMismatchedProductImageCount(
+    expectedSlugByName: Record<string, string>,
+  ): Promise<number> {
     const items = this.page.locator(this.SEL.productItems);
     const count = await items.count();
     let mismatches = 0;
 
     for (let i = 0; i < count; i++) {
       const item = items.nth(i);
-      const name = (await this.actions.getText(
-        item.locator(this.toScopedSelector(this.SEL.productNames)),
-        `product name ${i}`,
-      ))?.trim() ?? '';
+      const name =
+        (
+          await this.actions.getText(
+            item.locator(this.toScopedSelector(this.SEL.productNames)),
+            `product name ${i}`,
+          )
+        )?.trim() ?? '';
       const src = await this.actions.getAttributeValue(
         item.locator(this.SEL.productImage),
         'src',
@@ -97,10 +108,9 @@ export class InventoryPage extends BasePage {
   }
 
   async clickProduct(productName: string): Promise<void> {
-    const link = this.page.locator(
-      this.toScopedSelector(this.SEL.productNames),
-      { hasText: productName },
-    );
+    const link = this.page.locator(this.toScopedSelector(this.SEL.productNames), {
+      hasText: productName,
+    });
     await this.actions.click(link, `product link — ${productName}`);
   }
 
@@ -123,7 +133,10 @@ export class InventoryPage extends BasePage {
 
   async isAddToCartShownForProduct(productName: string): Promise<boolean> {
     const item = this.getProductItemByName(productName);
-    return this.actions.isVisible(item.locator(this.SEL.addToCartButton), `add to cart — ${productName}`);
+    return this.actions.isVisible(
+      item.locator(this.SEL.addToCartButton),
+      `add to cart — ${productName}`,
+    );
   }
 
   async isRemoveShownForProduct(productName: string): Promise<boolean> {

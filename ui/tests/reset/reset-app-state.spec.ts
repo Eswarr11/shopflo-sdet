@@ -116,12 +116,15 @@ test.describe('Reset App State', { tag: '@regression' }, () => {
       expect(await poManager.getInventoryPage().getCartBadgeCount()).toBe(0);
     });
 
-    await allure.step('Verify order overview has no items and purchase cannot complete with items', async () => {
-      const stepTwo = poManager.getCheckoutStepTwoPage();
-      expect(await stepTwo.getItemCount()).toBe(0);
-      expect(await stepTwo.getItemNames()).toHaveLength(0);
-      await stepTwo.finish();
-      await expect(page).not.toHaveURL(/checkout-complete/);
-    });
+    await allure.step(
+      'Verify order overview has no items and purchase cannot complete with items',
+      async () => {
+        const stepTwo = poManager.getCheckoutStepTwoPage();
+        expect(await stepTwo.getItemCount()).toBe(0);
+        expect(await stepTwo.getItemNames()).toHaveLength(0);
+        await stepTwo.finish();
+        await expect(page).not.toHaveURL(/checkout-complete/);
+      },
+    );
   });
 });

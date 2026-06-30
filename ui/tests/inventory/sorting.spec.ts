@@ -21,7 +21,7 @@ test.describe('Product Sorting', { tag: '@regression' }, () => {
       const inventory = poManager.getInventoryPage();
       await inventory.sortBy('az');
       const names = await inventory.getProductNames();
-      expect(names.length).toBe(6);
+      expect(names).toHaveLength(6);
       expect(names).toEqual([...names].sort());
     });
   });
@@ -31,7 +31,7 @@ test.describe('Product Sorting', { tag: '@regression' }, () => {
       const inventory = poManager.getInventoryPage();
       await inventory.sortBy('za');
       const names = await inventory.getProductNames();
-      expect(names.length).toBe(6);
+      expect(names).toHaveLength(6);
       expect(names).toEqual([...names].sort().reverse());
     });
   });
@@ -41,7 +41,7 @@ test.describe('Product Sorting', { tag: '@regression' }, () => {
       const inventory = poManager.getInventoryPage();
       await inventory.sortBy('lohi');
       const prices = await inventory.getProductPrices();
-      expect(prices.length).toBe(6);
+      expect(prices).toHaveLength(6);
       for (let i = 0; i < prices.length - 1; i++) {
         expect(prices[i]).toBeLessThanOrEqual(prices[i + 1]);
       }
@@ -53,7 +53,7 @@ test.describe('Product Sorting', { tag: '@regression' }, () => {
       const inventory = poManager.getInventoryPage();
       await inventory.sortBy('hilo');
       const prices = await inventory.getProductPrices();
-      expect(prices.length).toBe(6);
+      expect(prices).toHaveLength(6);
       for (let i = 0; i < prices.length - 1; i++) {
         expect(prices[i]).toBeGreaterThanOrEqual(prices[i + 1]);
       }

@@ -4,10 +4,10 @@ import { BasePage } from '../pages/base.page';
 export class BurgerMenuComponent extends BasePage {
   private readonly SEL = {
     allItemsLink: 'getByTestId("inventory-sidebar-link")',
-    aboutLink:    'getByTestId("about-sidebar-link")',
-    logoutLink:   'getByTestId("logout-sidebar-link")',
-    resetLink:    'getByTestId("reset-sidebar-link")',
-    closeButton:  '#react-burger-cross-btn',
+    aboutLink: 'getByTestId("about-sidebar-link")',
+    logoutLink: 'getByTestId("logout-sidebar-link")',
+    resetLink: 'getByTestId("reset-sidebar-link")',
+    closeButton: '#react-burger-cross-btn',
   };
 
   constructor(page: Page) {

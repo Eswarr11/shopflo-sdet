@@ -11,20 +11,24 @@ test.describe('Product detail page', { tag: '@regression' }, () => {
     await allure.story('Product Detail');
   });
 
-  test('Verify Product Detail Page Elements Visible', { tag: '@smoke' }, async ({ page, poManager }) => {
-    await setAllureTags('High', 'High');
-    await allure.step('Open product detail page from inventory', async () => {
-      const inventory = poManager.getInventoryPage();
-      await inventory.goto();
-      await inventory.clickProduct(PRODUCTS.BACKPACK.name);
-      await expect(page).toHaveURL(/inventory-item/);
-    });
-    await allure.step('Verify description and add-to-cart button are visible', async () => {
-      const detail = poManager.getProductDetailPage();
-      expect(await detail.isDescriptionVisible()).toBe(true);
-      expect(await detail.isAddToCartButtonVisible()).toBe(true);
-    });
-  });
+  test(
+    'Verify Product Detail Page Elements Visible',
+    { tag: '@smoke' },
+    async ({ page, poManager }) => {
+      await setAllureTags('High', 'High');
+      await allure.step('Open product detail page from inventory', async () => {
+        const inventory = poManager.getInventoryPage();
+        await inventory.goto();
+        await inventory.clickProduct(PRODUCTS.BACKPACK.name);
+        await expect(page).toHaveURL(/inventory-item/);
+      });
+      await allure.step('Verify description and add-to-cart button are visible', async () => {
+        const detail = poManager.getProductDetailPage();
+        expect(await detail.isDescriptionVisible()).toBe(true);
+        expect(await detail.isAddToCartButtonVisible()).toBe(true);
+      });
+    },
+  );
 
   test('Verify Product Detail Shows Correct Name and Price', async ({ poManager }) => {
     await setAllureTags('High', 'Medium');

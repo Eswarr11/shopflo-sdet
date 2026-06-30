@@ -9,8 +9,8 @@ const SETUP_TIMEOUT_MS = 60_000;
 const PERFORMANCE_GLITCH_TIMEOUT_MS = 90_000;
 
 const LOGIN_SEL = {
-  username:    '[data-test="username"]',
-  password:    '[data-test="password"]',
+  username: '[data-test="username"]',
+  password: '[data-test="password"]',
   loginButton: '[data-test="login-button"]',
 };
 
@@ -26,9 +26,7 @@ function resolveBaseURL(config: FullConfig): string {
   const fromEnv = process.env.UI_BASE_URL;
   if (fromEnv) return fromEnv.replace(/\/$/, '');
 
-  const fromProject = config.projects
-    ?.find((project) => project.name === 'ui')
-    ?.use?.baseURL;
+  const fromProject = config.projects?.find((project) => project.name === 'ui')?.use?.baseURL;
 
   if (typeof fromProject === 'string' && fromProject.length > 0) {
     return fromProject.replace(/\/$/, '');
@@ -91,9 +89,8 @@ async function loginAndSaveState(
   username: string,
   authFile: string,
 ): Promise<void> {
-  const timeout = username === USERS.PERFORMANCE_GLITCH
-    ? PERFORMANCE_GLITCH_TIMEOUT_MS
-    : SETUP_TIMEOUT_MS;
+  const timeout =
+    username === USERS.PERFORMANCE_GLITCH ? PERFORMANCE_GLITCH_TIMEOUT_MS : SETUP_TIMEOUT_MS;
 
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -110,9 +107,7 @@ async function loginAndSaveState(
     await context.storageState({ path: authFile });
     console.log(`[Setup] Auth saved for ${username}`);
   } catch (error) {
-    throw new Error(
-      `[Setup] Login failed for ${username}: ${(error as Error).message}`,
-    );
+    throw new Error(`[Setup] Login failed for ${username}: ${(error as Error).message}`);
   } finally {
     await context.close();
   }
@@ -158,7 +153,7 @@ async function globalSetup(config: FullConfig): Promise<void> {
   try {
     for (const username of AUTH_USERS) {
       const authFile = path.join(AUTH_DIR, `${username}.json`);
-      if (isAuthFileValid(authFile) && await verifyAuthFile(browser, baseURL, authFile)) {
+      if (isAuthFileValid(authFile) && (await verifyAuthFile(browser, baseURL, authFile))) {
         console.log(`[Setup] Auth file fresh for ${username}, skipping login`);
         continue;
       }

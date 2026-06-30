@@ -11,5 +11,13 @@
     "sourceMap": true
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules", "dist", "reports"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "reports",
+    "my-allure-results",
+    "playwright-report",
+    "test-results",
+    "allure-results"
+  ]
 }

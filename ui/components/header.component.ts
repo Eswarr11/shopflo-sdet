@@ -3,8 +3,8 @@ import { BasePage } from '../pages/base.page';
 
 export class HeaderComponent extends BasePage {
   private readonly SEL = {
-    cartBadge:        'getByTestId("shopping-cart-badge")',
-    cartLink:         'getByTestId("shopping-cart-link")',
+    cartBadge: 'getByTestId("shopping-cart-badge")',
+    cartLink: 'getByTestId("shopping-cart-link")',
     burgerMenuButton: '#react-burger-menu-btn',
   };
 

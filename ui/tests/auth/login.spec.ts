@@ -14,18 +14,22 @@ test.describe('Login', { tag: '@regression' }, () => {
   });
 
   test.describe('Positive', () => {
-    test('Verify Standard User Can Access Inventory After Login', { tag: '@smoke' }, async ({ page, poManager }) => {
-      await setAllureTags('Critical', 'Critical');
-      await allure.step('Log in with standard_user credentials', async () => {
-        await poManager.getLoginPage().login(USERS.STANDARD, PASSWORD);
-      });
-      await allure.step('Verify inventory page is displayed with 6 products', async () => {
-        await expect(page).toHaveURL(/inventory/);
-        const inventory = poManager.getInventoryPage();
-        expect(await inventory.isPageTitleVisible()).toBe(true);
-        expect(await inventory.getProductCount()).toBe(6);
-      });
-    });
+    test(
+      'Verify Standard User Can Access Inventory After Login',
+      { tag: '@smoke' },
+      async ({ page, poManager }) => {
+        await setAllureTags('Critical', 'Critical');
+        await allure.step('Log in with standard_user credentials', async () => {
+          await poManager.getLoginPage().login(USERS.STANDARD, PASSWORD);
+        });
+        await allure.step('Verify inventory page is displayed with 6 products', async () => {
+          await expect(page).toHaveURL(/inventory/);
+          const inventory = poManager.getInventoryPage();
+          expect(await inventory.isPageTitleVisible()).toBe(true);
+          expect(await inventory.getProductCount()).toBe(6);
+        });
+      },
+    );
   });
 
   test.describe('Negative', () => {
@@ -35,11 +39,14 @@ test.describe('Login', { tag: '@regression' }, () => {
       await allure.step('Attempt login with locked_out_user', async () => {
         await loginPage.login(USERS.LOCKED, PASSWORD);
       });
-      await allure.step('Verify locked-out error is shown and user stays on login page', async () => {
-        await expect(page).not.toHaveURL(/inventory/);
-        expect(await loginPage.isErrorVisible()).toBe(true);
-        expect(await loginPage.getErrorMessage()).toContain(MESSAGES.LOGIN.LOCKED_OUT);
-      });
+      await allure.step(
+        'Verify locked-out error is shown and user stays on login page',
+        async () => {
+          await expect(page).not.toHaveURL(/inventory/);
+          expect(await loginPage.isErrorVisible()).toBe(true);
+          expect(await loginPage.getErrorMessage()).toContain(MESSAGES.LOGIN.LOCKED_OUT);
+        },
+      );
     });
 
     test('Verify Wrong Password Shows Credentials Error', async ({ page, poManager }) => {

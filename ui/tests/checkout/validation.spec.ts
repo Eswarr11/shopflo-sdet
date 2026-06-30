@@ -52,7 +52,9 @@ test.describe('Verify Mandatory Customer Information Validation', { tag: '@regre
     });
   });
 
-  test('all fields empty shows validation error (first name checked first)', async ({ poManager }) => {
+  test('all fields empty shows validation error (first name checked first)', async ({
+    poManager,
+  }) => {
     const stepOne = poManager.getCheckoutStepOnePage();
     await allure.step('Submit checkout step one with all fields empty', async () => {
       await stepOne.continue();

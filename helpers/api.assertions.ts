@@ -39,10 +39,9 @@ export async function assertApiErrorStatus(
     apiError = err as AxiosError;
   }
 
-  expect(
-    apiError?.response?.status,
-    `Expected API error with status ${expectedStatus}`,
-  ).toBe(expectedStatus);
+  expect(apiError?.response?.status, `Expected API error with status ${expectedStatus}`).toBe(
+    expectedStatus,
+  );
 }
 
 type ShapeMap = Record<string, string>;

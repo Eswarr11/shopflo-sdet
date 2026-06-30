@@ -37,9 +37,9 @@ export const PRODUCT_IMAGE_SLUGS: Record<string, string> = {
 const AUTH_DIR = path.join(process.cwd(), '.auth');
 
 export const AUTH_FILES = {
-  STANDARD_USER:           path.join(AUTH_DIR, 'standard_user.json'),
-  PROBLEM_USER:            path.join(AUTH_DIR, 'problem_user.json'),
+  STANDARD_USER: path.join(AUTH_DIR, 'standard_user.json'),
+  PROBLEM_USER: path.join(AUTH_DIR, 'problem_user.json'),
   PERFORMANCE_GLITCH_USER: path.join(AUTH_DIR, 'performance_glitch_user.json'),
-  ERROR_USER:              path.join(AUTH_DIR, 'error_user.json'),
-  VISUAL_USER:             path.join(AUTH_DIR, 'visual_user.json'),
+  ERROR_USER: path.join(AUTH_DIR, 'error_user.json'),
+  VISUAL_USER: path.join(AUTH_DIR, 'visual_user.json'),
 } as const;

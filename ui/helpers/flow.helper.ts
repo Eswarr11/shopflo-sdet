@@ -27,10 +27,7 @@ export async function addProductFromDetailPage(
   return price;
 }
 
-export async function navigateToCart(
-  poManager: POManager,
-  productNames: string[],
-): Promise<void> {
+export async function navigateToCart(poManager: POManager, productNames: string[]): Promise<void> {
   await addProductsToCart(poManager, productNames);
   await poManager.getInventoryPage().goToCart();
 }

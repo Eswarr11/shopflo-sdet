@@ -8,31 +8,29 @@ const isCi = !!process.env.CI;
 const currentShard = process.env.CURRENT_SHARD
   ? parseInt(process.env.CURRENT_SHARD, 10)
   : undefined;
-const totalShards = process.env.TOTAL_SHARDS
-  ? parseInt(process.env.TOTAL_SHARDS, 10)
-  : undefined;
+const totalShards = process.env.TOTAL_SHARDS ? parseInt(process.env.TOTAL_SHARDS, 10) : undefined;
 
 const reporters: Parameters<typeof defineConfig>[0]['reporter'] = [
   ['blob', { outputDir: 'reports/blob' }],
-  ['allure-playwright', {
-    resultsDir: 'reports/allure-results',
-    detail: true,
-    suiteTitle: true,
-  }],
+  [
+    'allure-playwright',
+    {
+      resultsDir: 'reports/allure-results',
+      detail: true,
+      suiteTitle: true,
+    },
+  ],
 ];
 
 export default defineConfig({
   testDir: '.',
   fullyParallel: true,
   retries: isCi ? 1 : 0,
-  workers: process.env.WORKERS
-    ? Number(process.env.WORKERS)
-    : isCi
-      ? 2
+  workers: process.env.WORKERS ? Number(process.env.WORKERS) : isCi ? 2 : undefined,
+  shard:
+    !isCi && currentShard && totalShards
+      ? { current: currentShard, total: totalShards }
       : undefined,
-  shard: !isCi && currentShard && totalShards
-    ? { current: currentShard, total: totalShards }
-    : undefined,
   globalSetup: path.resolve(__dirname, 'global-setup'),
   globalTeardown: path.resolve(__dirname, 'global-teardown'),
   reporter: reporters,
@@ -56,7 +54,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         baseURL: process.env.UI_BASE_URL || 'https://www.saucedemo.com',
-        headless:  process.env.HEADED !== 'true',
+        headless: process.env.HEADED !== 'true',
       },
     },
   ],

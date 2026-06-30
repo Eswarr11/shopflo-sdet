@@ -7,16 +7,13 @@ if (!fs.existsSync(LOG_DIR)) {
   fs.mkdirSync(LOG_DIR, { recursive: true });
 }
 
-const logFormat = format.printf(({ timestamp, level, message }) =>
-  `${timestamp} [${level.toUpperCase()}]: ${message}`
+const logFormat = format.printf(
+  ({ timestamp, level, message }) => `${timestamp} [${level.toUpperCase()}]: ${message}`,
 );
 
 const logger: Logger = createLogger({
   level: 'info',
-  format: format.combine(
-    format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    logFormat
-  ),
+  format: format.combine(format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), logFormat),
   transports: [
     new transports.File({
       filename: path.join(LOG_DIR, 'playwright-actions.log'),
@@ -25,7 +22,7 @@ const logger: Logger = createLogger({
       format: format.combine(
         format.colorize(),
         format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-        logFormat
+        logFormat,
       ),
     }),
   ],

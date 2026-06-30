@@ -20,14 +20,18 @@ test.describe('Inventory — Add / Remove from Cart', { tag: '@regression' }, ()
       });
     });
 
-    test('Verify Adding One Product Updates Cart Badge', { tag: '@smoke' }, async ({ poManager }) => {
-      await setAllureTags('Critical', 'Critical');
-      await allure.step('Add backpack to cart and verify badge shows 1', async () => {
-        const inventory = poManager.getInventoryPage();
-        await inventory.addToCartByName(PRODUCTS.BACKPACK.name);
-        expect(await inventory.getCartBadgeCount()).toBe(1);
-      });
-    });
+    test(
+      'Verify Adding One Product Updates Cart Badge',
+      { tag: '@smoke' },
+      async ({ poManager }) => {
+        await setAllureTags('Critical', 'Critical');
+        await allure.step('Add backpack to cart and verify badge shows 1', async () => {
+          const inventory = poManager.getInventoryPage();
+          await inventory.addToCartByName(PRODUCTS.BACKPACK.name);
+          expect(await inventory.getCartBadgeCount()).toBe(1);
+        });
+      },
+    );
 
     test('Verify Adding Three Products Updates Cart Badge', async ({ poManager }) => {
       await setAllureTags('High', 'Medium');
