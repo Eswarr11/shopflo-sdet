@@ -7,8 +7,8 @@ type CasePriority = 'Critical' | 'High' | 'Medium' | 'Low';
 const SEVERITY_MAP: Record<CaseSeverity, AllureSeverity> = {
   Critical: 'critical',
   High: 'normal',
-  Medium: 'normal',
-  Low: 'minor',
+  Medium: 'minor',
+  Low: 'trivial',
 };
 
 export async function setAllureTags(severity: CaseSeverity, priority: CasePriority): Promise<void> {

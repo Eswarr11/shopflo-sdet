@@ -1,10 +1,11 @@
 import eslint from '@eslint/js';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import { defineConfig } from 'eslint/config';
 import playwright from 'eslint-plugin-playwright';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-export default tseslint.config(
+export default defineConfig(
   {
     ignores: [
       'node_modules/**',
@@ -43,7 +44,19 @@ export default tseslint.config(
     rules: {
       ...playwright.configs['flat/recommended'].rules,
       'playwright/no-wait-for-timeout': 'error',
-      'playwright/expect-expect': 'off',
+      'playwright/expect-expect': [
+        'error',
+        {
+          assertFunctionNames: [
+            'expect',
+            'expectSuccessStatus',
+            'assertSchema',
+            'assertNullOrApiError',
+            'assertApiErrorStatus',
+            'assertFieldTypes',
+          ],
+        },
+      ],
     },
   },
 );
