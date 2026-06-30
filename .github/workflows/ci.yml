@@ -40,7 +40,7 @@ jobs:
           retention-days: 1
 
   api-tests:
-    name: API shard ${{ matrix.shard }}/${{ env.TOTAL_SHARDS }}
+    name: API shard ${{ matrix.shard }}/5
     runs-on: ubuntu-latest
     container:
       image: node:20-bookworm
@@ -109,7 +109,7 @@ jobs:
           retention-days: 14
 
   ui-tests:
-    name: UI shard ${{ matrix.shard }}/${{ env.TOTAL_SHARDS }}
+    name: UI shard ${{ matrix.shard }}/5
     needs: setup-auth
     runs-on: ubuntu-latest
     container:
