@@ -26,14 +26,29 @@ Set `HEADED=true` in `.env` to run UI tests in headed mode locally (headless by 
 
 ### Test Coverage
 
-| Module | Positive | Negative | E2E |
-|---|---|---|---|
-| Login | 1 | 5 | — |
-| Inventory (sort, add/remove) | 6 | 1 | — |
-| Product Detail | 3 | — | — |
-| Cart | 4 | — | — |
-| Checkout | 4 | 4 | 1 |
-| **Total** | **18** | **10** | **1** |
+**47 automated UI tests** across 17 spec files, grouped by module:
+
+| Module | Spec file(s) | Tests |
+|---|---|---:|
+| Login & logout | `auth/login.spec.ts`, `auth/logout.spec.ts` | 7 |
+| User types | `auth/user-types.spec.ts` | 4 |
+| Inventory — sorting | `inventory/sorting.spec.ts` | 4 |
+| Inventory — cart badge | `inventory/add-to-cart.spec.ts` | 5 |
+| Product detail | `inventory/product-detail.spec.ts` | 4 |
+| Cart | `cart/cart.spec.ts`, `cart/persistence.spec.ts` | 5 |
+| Checkout — E2E flows | `checkout/e2e.spec.ts` | 3 |
+| Checkout — alternate / problem / navigation | `alternate-checkout.spec.ts`, `problem-user-checkout.spec.ts`, `cart-navigation.spec.ts` | 3 |
+| Checkout — step-one validation | `checkout/validation.spec.ts` | 4 |
+| Checkout — order summary | `checkout/summary.spec.ts` | 2 |
+| Performance glitch | `performance-glitch/cart.spec.ts`, `performance-glitch/checkout-step-one.spec.ts` | 2 |
+| Reset app state | `reset/reset-app-state.spec.ts` | 4 |
+| **Total** | | **47** |
+
+**Coverage notes (combined scenarios):**
+
+- `checkout/validation.spec.ts` — one `test.describe` (`Verify Mandatory Customer Information Validation`) runs as **4 separate tests** (missing first name, last name, postal code, all fields empty).
+- `checkout/e2e.spec.ts` — `Verify Successful End-to-End Checkout for Standard User` clubs the full checkout flow with order-summary price checks (subtotal, per-item prices, total = subtotal + tax). The same pricing rules are also covered in isolation by `checkout/summary.spec.ts`.
+- `@smoke` — tagged on login, add-to-cart, product detail, E2E checkout, and API cart POST.
 
 ### Framework: Playwright v1.61 + TypeScript
 
@@ -77,6 +92,8 @@ await this.actions.click(item.locator('button'), `Add to cart — ${productName}
 
 **Parallelisation:** `fullyParallel: true` with **5 shards × 2 workers** on PR CI. Local sharding: `CURRENT_SHARD=2 TOTAL_SHARDS=5 WORKERS=2 npm run test:regression`.
 
+**Cross-browser:** [`playwright.config.ts`](playwright.config.ts) currently runs UI tests on **Desktop Chrome** only. Firefox and Edge projects (`devices['Desktop Firefox']`, `devices['Desktop Edge']`) are a natural next step but were held off to keep CI runtime manageable — adding them would triple UI browser matrix cost unless scoped to a nightly or smoke-only job.
+
 **Reporting:** API and UI runs write to shared `reports/allure-results` and `reports/blob`. Run `npm run report` to produce one combined Allure report (`reports/allure-report`) and one Playwright HTML report (`reports/playwright-report`) covering both suites. Allure steps (`allure.step()`) are used in UI tests for business-readable reporting.
 
 ```bash
@@ -96,14 +113,17 @@ npx playwright show-report reports/playwright-report
 
 ### Test Coverage
 
-| Category | File | Count |
-|---|---|---|
-| Positive CRUD | `cart-crud.spec.ts`, `get.spec.ts` | POST, GET, PUT, PATCH, DELETE |
-| Negative cases | `cart-crud.spec.ts`, `get.spec.ts` | Missing/non-existent cart and empty PATCH scenarios |
-| Authentication | `cart-crud.spec.ts` | Authenticated cart request |
-| Response schema validation | `cart-crud.spec.ts`, `get.spec.ts` | Zod validation + field checks |
-| Data-driven test | `cart-data-driven.spec.ts` | Same POST cart scenario over 5 product IDs |
-| Contract / snapshot | `cart-contract.spec.ts` | One cart response shape contract |
+**31 automated API tests** across 6 spec files:
+
+| Spec file | Tests | Coverage |
+|---|---:|---|
+| `cart-crud.spec.ts` | 14 | CRUD, simulated negatives, auth, schema field checks |
+| `get.spec.ts` | 4 | GET list, by id, products array, non-existent id |
+| `cart-data-driven.spec.ts` | 5 | POST cart over 5 product IDs |
+| `cart-contract.spec.ts` | 2 | Single-cart snapshot + collection contract |
+| `post-validation.spec.ts` | 3 | Invalid productId, negative quantity, missing products field |
+| `security.spec.ts` | 2 | Missing / invalid Bearer token |
+| **Total** | **31** | |
 
 ### Framework: Playwright Test + Axios + Zod
 
@@ -127,20 +147,28 @@ npx playwright show-report reports/playwright-report
 ├── api/
 │   ├── services/          # Axios wrappers for cart CRUD + auth token setup
 │   ├── schemas/           # Cart Zod schema + z.infer types
-│   └── tests/
-│       └── carts/         # Cart CRUD, auth, schema, data-driven, contract
+│   └── tests/carts/
+│       ├── cart-crud.spec.ts
+│       ├── get.spec.ts
+│       ├── cart-data-driven.spec.ts
+│       ├── cart-contract.spec.ts
+│       ├── post-validation.spec.ts
+│       └── security.spec.ts
 ├── ui/
 │   ├── pages/             # Page Object Model (one class per page) + POManager
 │   ├── components/        # Header badge, burger menu (extend BasePage)
-│   ├── helpers/           # Shared checkout/cart flow helpers
+│   ├── helpers/           # Shared checkout/cart flow helpers (flow.helper.ts)
 │   └── tests/
-│       ├── auth/          # Login positive/negative + user-type behaviors
+│       ├── auth/          # Login, logout, user-type behaviors
 │       ├── inventory/     # Sort, add-to-cart, product detail
 │       ├── cart/          # Cart ops + persistence
-│       └── checkout/      # E2E, form validation, price accuracy
+│       ├── checkout/      # E2E, validation, summary, alternate, problem-user, cart-navigation
+│       ├── reset/         # Reset app state from inventory, cart, checkout
+│       └── performance-glitch/  # Delayed cart and checkout step-one loads
 ├── helpers/               # API client, PwActions, Faker builders, API assertions
 ├── config/                # Constants: UI users, products, auth files, messages, API credentials
 ├── fixtures/              # UI fixture (poManager) + API fixture (withAuthToken)
+├── scripts/               # Allure report generation + Playwright blob merge
 ├── global-setup.ts        # Pre-generates .auth/ storageState for all user types
 └── global-teardown.ts
 ```
@@ -175,13 +203,15 @@ CI runs `setup-auth` once, then API and UI each execute as a **5-shard matrix**.
 
 Pin `PLAYWRIGHT_IMAGE` in `ci.yml` to match `@playwright/test` in `package.json`. Container jobs set `ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true` because the Playwright image bundles Node 20 while GitHub runners default to Node 24.
 
-### GitHub Pages
+### CI artifacts
 
-On push to `main` or `master`, the `deploy-pages` job publishes merged reports. **Pull request runs skip deploy** (GitHub Pages only updates from direct pushes). You can also trigger deploy manually via **Actions → Playwright Tests → Run workflow**.
+Download `combined-reports-<run_number>` from the **Merge API and UI reports** job. The zip contains pre-built `allure-report/` and `playwright-report/` folders.
 
-Enable it once in the repo:
-
-**Settings → Pages → Build and deployment → Source: GitHub Actions**
+```bash
+# After unzipping the artifact locally
+npx allure open /path/to/allure-report
+npx playwright show-report /path/to/playwright-report
+```
 
 ### Sharding (local)
 
