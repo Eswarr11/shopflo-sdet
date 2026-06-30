@@ -11,25 +11,15 @@ const currentShard = process.env.CURRENT_SHARD
 const totalShards = process.env.TOTAL_SHARDS
   ? parseInt(process.env.TOTAL_SHARDS, 10)
   : undefined;
-const shardLabel = currentShard?.toString() ?? '1';
 
-const reporters: Parameters<typeof defineConfig>[0]['reporter'] = isCi
-  ? [
-      ['blob', { outputDir: 'blob-report' }],
-      ['allure-playwright', {
-        resultsDir: 'my-allure-results',
-        detail: true,
-        suiteTitle: true,
-      }],
-    ]
-  : [
-      ['html', { outputFolder: `reports/html/shard-${shardLabel}`, open: 'never' }],
-      ['allure-playwright', {
-        resultsDir: `reports/allure-results/shard-${shardLabel}`,
-        detail: true,
-        suiteTitle: true,
-      }],
-    ];
+const reporters: Parameters<typeof defineConfig>[0]['reporter'] = [
+  ['blob', { outputDir: 'reports/blob' }],
+  ['allure-playwright', {
+    resultsDir: 'reports/allure-results',
+    detail: true,
+    suiteTitle: true,
+  }],
+];
 
 export default defineConfig({
   testDir: '.',

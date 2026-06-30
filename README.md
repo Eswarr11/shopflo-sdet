@@ -12,7 +12,8 @@ npm run test:ui           # SauceDemo UI
 npm run test:all          # API + UI (full suite)
 npm run test:smoke        # @smoke tagged tests
 npm run test:regression   # API + UI regression
-npm run report:allure     # Generate Allure report
+npm run report            # Generate combined Allure + Playwright HTML reports
+npm run test:all:report   # Run full suite and generate combined reports
 ```
 
 Auth sessions for UI tests are generated automatically by `global-setup.ts` before the suite runs. Re-run tests anytime — auth files in `.auth/` are refreshed when older than 24 hours.
@@ -76,7 +77,18 @@ await this.actions.click(item.locator('button'), `Add to cart — ${productName}
 
 **Parallelisation:** `fullyParallel: true` with **5 shards × 2 workers** on PR CI. Local sharding: `CURRENT_SHARD=2 TOTAL_SHARDS=5 WORKERS=2 npm run test:regression`.
 
-**Reporting:** Playwright's native HTML report and Allure are configured per shard (`reports/html/shard-N`, `reports/allure-results/shard-N`). Allure steps (`allure.step()`) are used in every UI test for business-readable reporting.
+**Reporting:** API and UI runs write to shared `reports/allure-results` and `reports/blob`. Run `npm run report` to produce one combined Allure report (`reports/allure-report`) and one Playwright HTML report (`reports/playwright-report`) covering both suites. Allure steps (`allure.step()`) are used in UI tests for business-readable reporting.
+
+```bash
+# Separate runs, single combined report
+npm run test:api && npm run test:ui && npm run report
+
+# Or run everything and report in one step
+npm run test:all:report
+
+npx allure open reports/allure-report
+npx playwright show-report reports/playwright-report
+```
 
 ---
 
@@ -152,14 +164,14 @@ test('example', async ({ poManager }) => {
 |---|---|---|---|---|
 | [`ci.yml`](.github/workflows/ci.yml) | Push + PR to `main` / `master` | UI: Playwright Docker, API: Node 24 | 5 | 2 |
 
-CI runs `setup-auth` once, then API and UI each execute as a **5-shard matrix**. Merged Playwright HTML + Allure reports are uploaded as build artifacts. On push to `main`/`master`, reports are also deployed to **GitHub Pages**.
+CI runs `setup-auth` once, then API and UI each execute as a **5-shard matrix**. A single `merge-reports` job combines all shard blobs and Allure results into one Playwright HTML + Allure artifact (`combined-reports-*`).
 
 ### Runner setup
 
 | Job | Environment | Why |
 |---|---|---|
 | `setup-auth`, `ui-tests` | `mcr.microsoft.com/playwright:v1.61.1-noble` | Browsers pre-installed — no `playwright install` step |
-| `api-tests`, `merge-*` | `ubuntu-latest` + Node 24 | API tests need no browser; merge jobs only need npm + Java |
+| `api-tests`, `merge-reports` | `ubuntu-latest` + Node 24 | API tests need no browser; merge job needs npm + Java |
 
 Pin `PLAYWRIGHT_IMAGE` in `ci.yml` to match `@playwright/test` in `package.json`. Container jobs set `ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true` because the Playwright image bundles Node 20 while GitHub runners default to Node 24.
 
@@ -183,4 +195,4 @@ WORKERS=2 npx playwright test --project=api --project=ui --shard=2/5
 
 Optional env vars (see [`.env.example`](.env.example)): `WORKERS`, `CURRENT_SHARD`, `TOTAL_SHARDS`.
 
-Playwright HTML and Allure reports are uploaded as build artifacts on every run (pass or fail).
+Combined Playwright HTML and Allure reports are uploaded as a single `combined-reports-*` build artifact on every run (pass or fail).

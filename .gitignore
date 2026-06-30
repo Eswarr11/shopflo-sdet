@@ -6,10 +6,10 @@ playwright-report/
 test-results/
 .auth/
 allure-results/
+blob-report/
+my-allure-results/
 
 # Playwright
 /playwright-report/
 /playwright/.cache/
 /playwright/.auth/
-my-allure-results/
-blob-report/

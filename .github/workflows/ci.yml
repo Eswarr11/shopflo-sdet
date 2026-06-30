@@ -86,7 +86,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: api-blob-report-shard-${{ matrix.shard }}
-          path: blob-report
+          path: reports/blob
           if-no-files-found: warn
           retention-days: 1
 
@@ -95,13 +95,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: api-allure-results-shard-${{ matrix.shard }}
-          path: my-allure-results
+          path: reports/allure-results
           if-no-files-found: warn
           retention-days: 1
 
-  merge-api-reports:
-    name: Merge API reports
-    needs: api-tests
+  merge-reports:
+    name: Merge API and UI reports
+    needs: [api-tests, ui-tests]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -126,7 +126,7 @@ jobs:
         continue-on-error: true
         with:
           path: all-blob-reports
-          pattern: api-blob-report-shard-*
+          pattern: '*-blob-report-shard-*'
           merge-multiple: true
 
       - name: Download all Allure results
@@ -134,7 +134,7 @@ jobs:
         continue-on-error: true
         with:
           path: combined-allure-results
-          pattern: api-allure-results-shard-*
+          pattern: '*-allure-results-shard-*'
           merge-multiple: true
 
       - name: Merge Playwright reports
@@ -145,11 +145,11 @@ jobs:
         run: npx allure generate combined-allure-results --clean -o allure-report
         continue-on-error: true
 
-      - name: Upload merged API reports
+      - name: Upload combined reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: api-reports-${{ github.run_number }}
+          name: combined-reports-${{ github.run_number }}
           path: |
             playwright-report/
             allure-report/
@@ -204,7 +204,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ui-blob-report-shard-${{ matrix.shard }}
-          path: blob-report
+          path: reports/blob
           if-no-files-found: warn
           retention-days: 1
 
@@ -213,63 +213,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ui-allure-results-shard-${{ matrix.shard }}
-          path: my-allure-results
+          path: reports/allure-results
           if-no-files-found: warn
           retention-days: 1
-
-  merge-ui-reports:
-    name: Merge UI reports
-    needs: ui-tests
-    if: ${{ !cancelled() }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Download all blob reports
-        uses: actions/download-artifact@v4
-        continue-on-error: true
-        with:
-          path: all-blob-reports
-          pattern: ui-blob-report-shard-*
-          merge-multiple: true
-
-      - name: Download all Allure results
-        uses: actions/download-artifact@v4
-        continue-on-error: true
-        with:
-          path: combined-allure-results
-          pattern: ui-allure-results-shard-*
-          merge-multiple: true
-
-      - name: Merge Playwright reports
-        run: npx playwright merge-reports --reporter html ./all-blob-reports
-        continue-on-error: true
-
-      - name: Generate Allure report
-        run: npx allure generate combined-allure-results --clean -o allure-report
-        continue-on-error: true
-
-      - name: Upload merged UI reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ui-reports-${{ github.run_number }}
-          path: |
-            playwright-report/
-            allure-report/
-          if-no-files-found: warn
-          retention-days: 14
