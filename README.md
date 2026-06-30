@@ -67,7 +67,7 @@ Set `HEADED=true` in `.env` to run UI tests in headed mode locally (headless by 
 
 ### Locator Conventions
 
-SauceDemo exposes stable `data-test` attributes. The framework maps them through Playwright's `getByTestId` via a string DSL resolved by `PwActions` in [`helpers/pw-actions.ts`](helpers/pw-actions.ts).
+SauceDemo exposes stable `data-test` attributes. The framework maps them through a string DSL resolved by `PwActions` in [`helpers/pw-actions.ts`](helpers/pw-actions.ts).
 
 **Rules:**
 
@@ -76,7 +76,7 @@ SauceDemo exposes stable `data-test` attributes. The framework maps them through
 - **Scoped rows:** Use `.inventory_item` / `.cart_item` with `page.locator(class, { hasText })` when targeting a product row — the container has no `data-test` attribute.
 - **Dynamic buttons:** Use `[data-test^="add-to-cart"]` / `[data-test^="remove"]` for per-product button ids (e.g. `add-to-cart-sauce-labs-backpack`).
 - **ID fallback:** Use `#react-burger-menu-btn` / `#react-burger-cross-btn` only where SauceDemo provides no `data-test` (burger menu open/close).
-- **All interactions via PwActions** — never call Playwright native `.click()`, `.fill()`, etc. in page objects or tests.
+- **All interactions via PwActions** — never call Playwright native `.click()`, `.fill()`, etc. in page objects or tests. `PwActions` accepts `string | Locator` for scoped row helpers.
 
 ```typescript
 // login.page.ts — preferred pattern
