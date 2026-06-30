@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+const isCi = !!process.env.CI;
 const currentShard = process.env.CURRENT_SHARD
   ? parseInt(process.env.CURRENT_SHARD, 10)
   : undefined;
@@ -10,29 +11,34 @@ const totalShards = process.env.TOTAL_SHARDS
   : undefined;
 const shardLabel = currentShard?.toString() ?? '1';
 
-const reporters: Parameters<typeof defineConfig>[0]['reporter'] = [
-  ['html', { outputFolder: `reports/html/shard-${shardLabel}`, open: 'never' }],
-  ['allure-playwright', {
-    resultsDir: `reports/allure-results/shard-${shardLabel}`,
-    detail: true,
-    suiteTitle: true,
-  }],
-];
-
-if (process.env.CI) {
-  reporters.unshift(['blob', { outputDir: `reports/blob/shard-${shardLabel}` }]);
-}
+const reporters: Parameters<typeof defineConfig>[0]['reporter'] = isCi
+  ? [
+      ['blob', { outputDir: 'blob-report' }],
+      ['allure-playwright', {
+        resultsDir: 'my-allure-results',
+        detail: true,
+        suiteTitle: true,
+      }],
+    ]
+  : [
+      ['html', { outputFolder: `reports/html/shard-${shardLabel}`, open: 'never' }],
+      ['allure-playwright', {
+        resultsDir: `reports/allure-results/shard-${shardLabel}`,
+        detail: true,
+        suiteTitle: true,
+      }],
+    ];
 
 export default defineConfig({
   testDir: '.',
   fullyParallel: true,
-  retries: process.env.CI ? 2 : 0,
+  retries: isCi ? 1 : 0,
   workers: process.env.WORKERS
     ? Number(process.env.WORKERS)
-    : process.env.CI
+    : isCi
       ? 2
       : undefined,
-  shard: currentShard && totalShards
+  shard: !isCi && currentShard && totalShards
     ? { current: currentShard, total: totalShards }
     : undefined,
   globalSetup: './global-setup',
@@ -53,8 +59,6 @@ export default defineConfig({
       use: { baseURL: process.env.API_BASE_URL || 'https://fakestoreapi.com' },
     },
     {
-      // To add more browsers: copy this block and swap devices['Desktop Chrome']
-      // for devices['Desktop Firefox'] or devices['Desktop Safari']
       name: 'ui',
       testDir: './ui/tests',
       use: {

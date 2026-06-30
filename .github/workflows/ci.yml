@@ -1,32 +1,27 @@
-name: CI
+name: Playwright Tests
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [main, master]
   pull_request:
-    branches:
-      - main
-      - master
+    branches: [main, master]
 
 permissions:
   contents: read
   actions: write
 
 env:
-  TOTAL_SHARDS: '5'
-  WORKERS: '2'
   API_BASE_URL: https://fakestoreapi.com
   UI_BASE_URL: https://www.saucedemo.com
-  PLAYWRIGHT_IMAGE: mcr.microsoft.com/playwright:v1.61.1-jammy
+  PLAYWRIGHT_IMAGE: mcr.microsoft.com/playwright:v1.61.1-noble
 
 jobs:
   setup-auth:
     name: Generate auth sessions
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     container:
-      image: mcr.microsoft.com/playwright:v1.61.1-jammy
+      image: mcr.microsoft.com/playwright:v1.61.1-noble
     steps:
       - uses: actions/checkout@v4
 
@@ -48,41 +43,52 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: auth-state
-          path: .auth/
+          path: .auth
           if-no-files-found: error
           retention-days: 1
 
   api-tests:
     name: API shard ${{ matrix.shard }}/5
     runs-on: ubuntu-latest
-    container:
-      image: node:20-bookworm
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       max-parallel: 2
       matrix:
         shard: [1, 2, 3, 4, 5]
+    env:
+      CI: true
+      WORKERS: '2'
+      API_BASE_URL: ${{ env.API_BASE_URL }}
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run API tests
-        run: npm run test:api
-        env:
-          CI: true
-          API_BASE_URL: ${{ env.API_BASE_URL }}
-          CURRENT_SHARD: ${{ matrix.shard }}
-          TOTAL_SHARDS: ${{ env.TOTAL_SHARDS }}
-          WORKERS: ${{ env.WORKERS }}
+        run: npx playwright test api/tests --project=api --shard=${{ matrix.shard }}/5
 
-      - name: Upload API shard reports
-        uses: actions/upload-artifact@v4
+      - name: Upload blob report
         if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: api-shard-${{ matrix.shard }}
-          path: reports/
+          name: api-blob-report-shard-${{ matrix.shard }}
+          path: blob-report
+          if-no-files-found: warn
+          retention-days: 1
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-allure-results-shard-${{ matrix.shard }}
+          path: my-allure-results
           if-no-files-found: warn
           retention-days: 1
 
@@ -91,37 +97,55 @@ jobs:
     needs: api-tests
     if: always()
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Download API shard reports
+      - name: Download all blob reports
         uses: actions/download-artifact@v4
         continue-on-error: true
         with:
-          pattern: api-shard-*
+          path: all-blob-reports
+          pattern: api-blob-report-shard-*
           merge-multiple: true
-          path: reports
 
-      - name: Merge Playwright HTML reports
-        run: node scripts/merge-blob-reports.js
+      - name: Download all Allure results
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          path: combined-allure-results
+          pattern: api-allure-results-shard-*
+          merge-multiple: true
 
-      - name: Generate merged Allure report
-        run: npm run report:allure
+      - name: Merge Playwright reports
+        run: npx playwright merge-reports --reporter html ./all-blob-reports
+        continue-on-error: true
+
+      - name: Generate Allure report
+        run: npx allure generate combined-allure-results --clean -o allure-report
+        continue-on-error: true
 
       - name: Upload merged API reports
-        uses: actions/upload-artifact@v4
         if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: api-reports-${{ github.run_number }}
-          path: reports/
+          path: |
+            playwright-report/
+            allure-report/
           if-no-files-found: warn
           retention-days: 14
 
@@ -130,12 +154,17 @@ jobs:
     needs: setup-auth
     if: ${{ needs.setup-auth.result == 'success' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     container:
-      image: mcr.microsoft.com/playwright:v1.61.1-jammy
+      image: mcr.microsoft.com/playwright:v1.61.1-noble
     strategy:
       fail-fast: false
       matrix:
         shard: [1, 2, 3, 4, 5]
+    env:
+      CI: true
+      WORKERS: '2'
+      UI_BASE_URL: ${{ env.UI_BASE_URL }}
     steps:
       - uses: actions/checkout@v4
 
@@ -143,7 +172,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: auth-state
-          path: .auth/
+          path: .auth
 
       - name: Verify auth files
         run: |
@@ -154,20 +183,23 @@ jobs:
         run: npm ci
 
       - name: Run UI tests
-        run: npm run test:ui
-        env:
-          CI: true
-          UI_BASE_URL: ${{ env.UI_BASE_URL }}
-          CURRENT_SHARD: ${{ matrix.shard }}
-          TOTAL_SHARDS: ${{ env.TOTAL_SHARDS }}
-          WORKERS: ${{ env.WORKERS }}
+        run: npx playwright test ui/tests --project=ui --shard=${{ matrix.shard }}/5
 
-      - name: Upload UI shard reports
-        uses: actions/upload-artifact@v4
+      - name: Upload blob report
         if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: ui-shard-${{ matrix.shard }}
-          path: reports/
+          name: ui-blob-report-shard-${{ matrix.shard }}
+          path: blob-report
+          if-no-files-found: warn
+          retention-days: 1
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-allure-results-shard-${{ matrix.shard }}
+          path: my-allure-results
           if-no-files-found: warn
           retention-days: 1
 
@@ -176,36 +208,54 @@ jobs:
     needs: ui-tests
     if: always()
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Download UI shard reports
+      - name: Download all blob reports
         uses: actions/download-artifact@v4
         continue-on-error: true
         with:
-          pattern: ui-shard-*
+          path: all-blob-reports
+          pattern: ui-blob-report-shard-*
           merge-multiple: true
-          path: reports
 
-      - name: Merge Playwright HTML reports
-        run: node scripts/merge-blob-reports.js
+      - name: Download all Allure results
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          path: combined-allure-results
+          pattern: ui-allure-results-shard-*
+          merge-multiple: true
 
-      - name: Generate merged Allure report
-        run: npm run report:allure
+      - name: Merge Playwright reports
+        run: npx playwright merge-reports --reporter html ./all-blob-reports
+        continue-on-error: true
+
+      - name: Generate Allure report
+        run: npx allure generate combined-allure-results --clean -o allure-report
+        continue-on-error: true
 
       - name: Upload merged UI reports
-        uses: actions/upload-artifact@v4
         if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: ui-reports-${{ github.run_number }}
-          path: reports/
+          path: |
+            playwright-report/
+            allure-report/
           if-no-files-found: warn
           retention-days: 14

@@ -150,29 +150,27 @@ test('example', async ({ poManager }) => {
 
 | Workflow | Trigger | Container | Shards | Workers |
 |---|---|---|---|---|
-| [`ci.yml`](.github/workflows/ci.yml) | Push + PR to `main` / `master` | API: `node:20-bookworm`, UI: Playwright Docker | 5 | 2 |
+| [`ci.yml`](.github/workflows/ci.yml) | Push + PR to `main` / `master` | UI: Playwright Docker, API: Node 24 | 5 | 2 |
 
-CI runs `setup-auth` once, then API and UI each execute as a **5-shard matrix** in parallel. Per-shard blob + Allure results are merged into combined HTML and Allure artifacts.
+CI runs `setup-auth` once, then API and UI each execute as a **5-shard matrix**. Each shard uploads `blob-report` and `my-allure-results` artifacts; a merge job combines them into Playwright HTML + Allure reports (uploaded as build artifacts — no GitHub Pages deploy).
 
-### Docker image
+### Runner setup
 
-The UI job uses the official Playwright image pinned to the `@playwright/test` version:
+| Job | Environment | Why |
+|---|---|---|
+| `setup-auth`, `ui-tests` | `mcr.microsoft.com/playwright:v1.61.1-noble` | Browsers pre-installed — no `playwright install` step |
+| `api-tests`, `merge-*` | `ubuntu-latest` + Node 24 | API tests need no browser; merge jobs only need npm + Java |
 
-```text
-mcr.microsoft.com/playwright:v1.61.1-jammy
-```
-
-When bumping `@playwright/test`, update `PLAYWRIGHT_IMAGE` in `ci.yml` to match. The API job uses `node:20-bookworm` (no browser install needed).
+Pin `PLAYWRIGHT_IMAGE` in `ci.yml` to match `@playwright/test` in `package.json`.
 
 ### Sharding (local)
 
 ```bash
-# Run shard 2 of 5 with 2 workers
+# Run shard 2 of 5 with 2 workers (env-driven)
 CURRENT_SHARD=2 TOTAL_SHARDS=5 WORKERS=2 npm run test:regression
 
-# Run all shards locally, then generate Allure report
-for i in 1 2 3 4 5; do CURRENT_SHARD=$i TOTAL_SHARDS=5 WORKERS=2 npm run test:regression; done
-npm run report:allure
+# Or CLI shard flag
+WORKERS=2 npx playwright test --project=api --project=ui --shard=2/5
 ```
 
 Optional env vars (see [`.env.example`](.env.example)): `WORKERS`, `CURRENT_SHARD`, `TOTAL_SHARDS`.
