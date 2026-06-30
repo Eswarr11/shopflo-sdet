@@ -72,6 +72,21 @@ test.describe('Cart CRUD — Negative Cases', () => {
   });
 });
 
+test.describe('Cart CRUD — Partial Update Integrity', () => {
+  test('Verify PATCH Does Not Modify Unspecified Fields', async () => {
+    const original = await carts.getById(1);
+    const patchProducts = [{ productId: 3, quantity: 2 }];
+
+    const patchRes = await carts.patch(1, { products: patchProducts });
+    expectSuccessStatus(patchRes.status);
+    expect(patchRes.data.products).toEqual(patchProducts);
+
+    const updated = await carts.getById(1);
+    expect(updated.data.userId).toBe(original.data.userId);
+    expect(updated.data.date).toBe(original.data.date);
+  });
+});
+
 test.describe('Cart CRUD — Authenticated Requests', () => {
   test('Authenticated GET /carts request returns data with Bearer token', async () => {
     const loginRes = await auth.login(API_USERS.VALID.username, API_USERS.VALID.password);
@@ -107,5 +122,10 @@ test.describe('Cart CRUD — Schema Validation', () => {
     const res = await carts.getById(1);
     expect(typeof res.data.date).toBe('string');
     expect(res.data.date.length).toBeGreaterThan(0);
+  });
+
+  test('Verify Cart Dates Follow ISO-8601 Format', async () => {
+    const res = await carts.getById(1);
+    assertSchema(CartSchema, res.data, 'cart date ISO-8601');
   });
 });

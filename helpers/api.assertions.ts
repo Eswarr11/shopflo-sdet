@@ -26,3 +26,36 @@ export async function assertNullOrApiError(
     expect((err as AxiosError).response?.status).toBe(expectedStatus);
   }
 }
+
+export async function assertApiErrorStatus(
+  action: () => Promise<unknown>,
+  expectedStatus: number,
+): Promise<void> {
+  let apiError: AxiosError | undefined;
+
+  try {
+    await action();
+  } catch (err) {
+    apiError = err as AxiosError;
+  }
+
+  expect(
+    apiError?.response?.status,
+    `Expected API error with status ${expectedStatus}`,
+  ).toBe(expectedStatus);
+}
+
+type ShapeMap = Record<string, string>;
+
+export function assertFieldTypes(obj: Record<string, unknown>, shapeMap: ShapeMap): void {
+  for (const [field, expectedType] of Object.entries(shapeMap)) {
+    if (expectedType === 'array') {
+      expect(Array.isArray(obj[field]), `Field '${field}' should be an array`).toBe(true);
+    } else {
+      expect(
+        typeof obj[field],
+        `Field '${field}' should be type '${expectedType}', got '${typeof obj[field]}'`,
+      ).toBe(expectedType);
+    }
+  }
+}

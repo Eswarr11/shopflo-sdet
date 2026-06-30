@@ -11,3 +11,12 @@ export async function withAuthToken<T>(
     setAuthToken(null);
   }
 }
+
+export async function withoutAuthToken<T>(fn: () => Promise<T>): Promise<T> {
+  setAuthToken(null);
+  try {
+    return await fn();
+  } finally {
+    setAuthToken(null);
+  }
+}

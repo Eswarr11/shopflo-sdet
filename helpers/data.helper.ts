@@ -22,7 +22,7 @@ export function buildCheckoutInfo(overrides: Partial<CheckoutInfo> = {}): Checko
 export function buildCart(overrides: Partial<CartPayload> = {}): CartPayload {
   return {
     userId: 1,
-    date: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString(),
     products: [{ productId: 1, quantity: 1 }],
     ...overrides,
   };
