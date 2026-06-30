@@ -10,7 +10,10 @@ export function setAuthToken(token: string | null): void {
 const apiClient: AxiosInstance = axios.create({
   baseURL: process.env.API_BASE_URL || 'https://fakestoreapi.com',
   timeout: 10000,
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    'Content-Type': 'application/json',
+    'User-Agent': 'automation-suite/1.0',
+  },
 });
 
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {

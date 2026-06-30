@@ -10,9 +10,15 @@ on:
       - main
       - master
 
+permissions:
+  contents: read
+  actions: write
+
 env:
   TOTAL_SHARDS: '5'
   WORKERS: '2'
+  API_BASE_URL: https://fakestoreapi.com
+  UI_BASE_URL: https://www.saucedemo.com
   PLAYWRIGHT_IMAGE: mcr.microsoft.com/playwright:v1.61.1-jammy
 
 jobs:
@@ -31,12 +37,19 @@ jobs:
         run: npx ts-node scripts/run-auth-setup.ts
         env:
           CI: true
+          UI_BASE_URL: ${{ env.UI_BASE_URL }}
+
+      - name: Verify auth files
+        run: |
+          ls -la .auth/
+          test "$(find .auth -name '*.json' | wc -l)" -ge 1
 
       - name: Upload auth state
         uses: actions/upload-artifact@v4
         with:
           name: auth-state
           path: .auth/
+          if-no-files-found: error
           retention-days: 1
 
   api-tests:
@@ -46,6 +59,7 @@ jobs:
       image: node:20-bookworm
     strategy:
       fail-fast: false
+      max-parallel: 2
       matrix:
         shard: [1, 2, 3, 4, 5]
     steps:
@@ -58,6 +72,7 @@ jobs:
         run: npm run test:api
         env:
           CI: true
+          API_BASE_URL: ${{ env.API_BASE_URL }}
           CURRENT_SHARD: ${{ matrix.shard }}
           TOTAL_SHARDS: ${{ env.TOTAL_SHARDS }}
           WORKERS: ${{ env.WORKERS }}
@@ -68,6 +83,7 @@ jobs:
         with:
           name: api-shard-${{ matrix.shard }}
           path: reports/
+          if-no-files-found: warn
           retention-days: 1
 
   merge-api-reports:
@@ -88,29 +104,31 @@ jobs:
 
       - name: Download API shard reports
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           pattern: api-shard-*
           merge-multiple: true
           path: reports
 
       - name: Merge Playwright HTML reports
-        run: npx playwright merge-reports --reporter html reports/blob/shard-*
-        continue-on-error: true
+        run: node scripts/merge-blob-reports.js
 
       - name: Generate merged Allure report
         run: npm run report:allure
-        continue-on-error: true
 
       - name: Upload merged API reports
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: api-reports-${{ github.run_number }}
           path: reports/
+          if-no-files-found: warn
           retention-days: 14
 
   ui-tests:
     name: UI shard ${{ matrix.shard }}/5
     needs: setup-auth
+    if: ${{ needs.setup-auth.result == 'success' }}
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-jammy
@@ -127,6 +145,11 @@ jobs:
           name: auth-state
           path: .auth/
 
+      - name: Verify auth files
+        run: |
+          ls -la .auth/
+          test "$(find .auth -name '*.json' | wc -l)" -ge 1
+
       - name: Install dependencies
         run: npm ci
 
@@ -134,6 +157,7 @@ jobs:
         run: npm run test:ui
         env:
           CI: true
+          UI_BASE_URL: ${{ env.UI_BASE_URL }}
           CURRENT_SHARD: ${{ matrix.shard }}
           TOTAL_SHARDS: ${{ env.TOTAL_SHARDS }}
           WORKERS: ${{ env.WORKERS }}
@@ -144,6 +168,7 @@ jobs:
         with:
           name: ui-shard-${{ matrix.shard }}
           path: reports/
+          if-no-files-found: warn
           retention-days: 1
 
   merge-ui-reports:
@@ -164,22 +189,23 @@ jobs:
 
       - name: Download UI shard reports
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           pattern: ui-shard-*
           merge-multiple: true
           path: reports
 
       - name: Merge Playwright HTML reports
-        run: npx playwright merge-reports --reporter html reports/blob/shard-*
-        continue-on-error: true
+        run: node scripts/merge-blob-reports.js
 
       - name: Generate merged Allure report
         run: npm run report:allure
-        continue-on-error: true
 
       - name: Upload merged UI reports
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: ui-reports-${{ github.run_number }}
           path: reports/
+          if-no-files-found: warn
           retention-days: 14

@@ -17,8 +17,8 @@ const hasResults = inputs.some(
 );
 
 if (!hasResults) {
-  console.error('No Allure results found. Run tests first (e.g. npm run test:smoke).');
-  process.exit(1);
+  console.warn('No Allure results found — skipping Allure report generation');
+  process.exit(0);
 }
 
 const outDir = path.join(process.cwd(), 'reports/allure-report');
