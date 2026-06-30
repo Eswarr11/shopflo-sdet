@@ -7,7 +7,7 @@
     "test:api": "playwright test api/tests --project=api",
     "test:all": "playwright test",
     "test:smoke": "playwright test --grep @smoke",
-    "test:regression": "playwright test --project=api --project=ui",
+    "test:regression": "playwright test --grep @regression",
     "report:allure": "node scripts/generate-allure-report.js",
     "report:html": "node scripts/merge-playwright-report.js",
     "report": "npm run report:allure && npm run report:html",

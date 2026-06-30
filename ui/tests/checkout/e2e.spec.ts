@@ -8,7 +8,7 @@ import { addProductFromDetailPage, navigateToCheckoutStepTwo } from '../../helpe
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
-test.describe('Checkout E2E', () => {
+test.describe('Checkout E2E', { tag: '@regression' }, () => {
   test('Verify Successful End-to-End Checkout for Standard User', { tag: '@smoke' }, async ({ page, poManager }) => {
     await allure.feature('Checkout');
     await allure.story('E2E');

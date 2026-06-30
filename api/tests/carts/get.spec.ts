@@ -5,7 +5,7 @@ import { assertNullOrApiError, assertSchema } from '../../../helpers/api.asserti
 
 const carts = new CartsService();
 
-test.describe('GET /carts', () => {
+test.describe('GET /carts', { tag: '@regression' }, () => {
 
   test.describe('Positive', () => {
     test('returns all carts with correct count', async () => {

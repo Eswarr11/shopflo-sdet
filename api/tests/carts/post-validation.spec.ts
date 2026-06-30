@@ -5,7 +5,7 @@ import { buildCart } from '../../../helpers/data.helper';
 
 const carts = new CartsService();
 
-test.describe('Cart — POST Validation', () => {
+test.describe('Cart — POST Validation', { tag: '@regression' }, () => {
   test('Verify POST With Invalid ProductId Returns Validation Error', async () => {
     const payload = buildCart({ products: [{ productId: 99999, quantity: 1 }] });
     await assertApiErrorStatus(() => carts.create(payload), 400);

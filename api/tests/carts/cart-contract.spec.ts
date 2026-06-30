@@ -40,7 +40,7 @@ function assertCartMatchesSnapshot(cart: Record<string, unknown>, index?: number
   });
 }
 
-test.describe('Cart — Contract / Snapshot Tests', () => {
+test.describe('Cart — Contract / Snapshot Tests', { tag: '@regression' }, () => {
   test('GET /carts/1 response shape conforms to committed cart snapshot', async () => {
     const res = await carts.getById(1);
     expect(res.status).toBe(200);

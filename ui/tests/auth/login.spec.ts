@@ -6,7 +6,7 @@ import { MESSAGES } from '../../../config/messages';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
-test.describe('Login', () => {
+test.describe('Login', { tag: '@regression' }, () => {
   test.beforeEach(async ({ poManager }) => {
     await allure.feature('Authentication');
     await allure.story('Login');

@@ -6,7 +6,7 @@ import { addProductsToCart } from '../../helpers/flow.helper';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
-test.describe('Cart operations', () => {
+test.describe('Cart operations', { tag: '@regression' }, () => {
   test.beforeEach(async () => {
     await allure.feature('Cart');
   });

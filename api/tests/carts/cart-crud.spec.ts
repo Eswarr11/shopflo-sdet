@@ -16,7 +16,7 @@ import { buildCart } from '../../../helpers/data.helper';
 const carts = new CartsService();
 const auth = new AuthService();
 
-test.describe('Cart CRUD — Positive Cases', () => {
+test.describe('Cart CRUD — Positive Cases', { tag: '@regression' }, () => {
   test('POST /carts creates a cart and returns a new id', { tag: '@smoke' }, async () => {
     const res = await carts.create(buildCart({ products: [{ productId: 5, quantity: 2 }] }));
     expectSuccessStatus(res.status);
@@ -49,7 +49,7 @@ test.describe('Cart CRUD — Positive Cases', () => {
   });
 });
 
-test.describe('Cart CRUD — Negative Cases', () => {
+test.describe('Cart CRUD — Negative Cases', { tag: '@regression' }, () => {
   test('POST /carts with empty products array still returns an id (FakeStoreAPI simulates)', async () => {
     const res = await carts.create(buildCart({ products: [] }));
     expectSuccessStatus(res.status);
@@ -72,7 +72,7 @@ test.describe('Cart CRUD — Negative Cases', () => {
   });
 });
 
-test.describe('Cart CRUD — Partial Update Integrity', () => {
+test.describe('Cart CRUD — Partial Update Integrity', { tag: '@regression' }, () => {
   test('Verify PATCH Does Not Modify Unspecified Fields', async () => {
     const original = await carts.getById(1);
     const patchProducts = [{ productId: 3, quantity: 2 }];
@@ -87,7 +87,7 @@ test.describe('Cart CRUD — Partial Update Integrity', () => {
   });
 });
 
-test.describe('Cart CRUD — Authenticated Requests', () => {
+test.describe('Cart CRUD — Authenticated Requests', { tag: '@regression' }, () => {
   test('Authenticated GET /carts request returns data with Bearer token', async () => {
     const loginRes = await auth.login(API_USERS.VALID.username, API_USERS.VALID.password);
     await withAuthToken(loginRes.data.token, async () => {
@@ -98,7 +98,7 @@ test.describe('Cart CRUD — Authenticated Requests', () => {
   });
 });
 
-test.describe('Cart CRUD — Schema Validation', () => {
+test.describe('Cart CRUD — Schema Validation', { tag: '@regression' }, () => {
   test('Cart products array items each have productId (number) and quantity (number)', async () => {
     const res = await carts.getById(1);
     expect(res.data.products.length).toBeGreaterThan(0);

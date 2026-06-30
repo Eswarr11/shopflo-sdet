@@ -3,7 +3,7 @@ import { setAllureTags } from '../../../helpers/allure-tags.helper';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { USERS, PASSWORD, AUTH_FILES, PRODUCT_IMAGE_SLUGS } from '../../../config/constants';
 
-test.describe('User type behaviors', () => {
+test.describe('User type behaviors', { tag: '@regression' }, () => {
   test.describe('Login-required scenarios', () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 

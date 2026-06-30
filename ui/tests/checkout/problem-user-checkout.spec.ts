@@ -7,7 +7,7 @@ import { addProductsToCart } from '../../helpers/flow.helper';
 
 test.use({ storageState: AUTH_FILES.PROBLEM_USER });
 
-test.describe('Verify Checkout Completion for Problem User', () => {
+test.describe('Verify Checkout Completion for Problem User', { tag: '@regression' }, () => {
   test('Verify Checkout Completion for Problem User', async ({ page, poManager }) => {
     await allure.feature('Checkout');
     await setAllureTags('High', 'High');

@@ -6,7 +6,7 @@ import { setAuthToken } from '../../../helpers/api.client';
 
 const carts = new CartsService();
 
-test.describe('Cart — Security', () => {
+test.describe('Cart — Security', { tag: '@regression' }, () => {
   test.beforeEach(async () => {
     await withoutAuthToken(async () => undefined);
   });

@@ -7,7 +7,7 @@ import { navigateToCheckoutStepTwo } from '../../helpers/flow.helper';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
-test.describe('Order summary accuracy', () => {
+test.describe('Order summary accuracy', { tag: '@regression' }, () => {
   test.beforeEach(async () => {
     await allure.feature('Checkout');
     await allure.story('Order Summary');

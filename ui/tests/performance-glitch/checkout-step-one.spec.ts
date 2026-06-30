@@ -6,7 +6,7 @@ import { navigateToCart } from '../../helpers/flow.helper';
 
 test.use({ storageState: AUTH_FILES.PERFORMANCE_GLITCH_USER });
 
-test.describe('Verify Checkout Information Page Loads With Delays', () => {
+test.describe('Verify Checkout Information Page Loads With Delays', { tag: '@regression' }, () => {
   test('Verify Checkout Information Page Loads With Delays', async ({ page, poManager }) => {
     await allure.feature('Checkout');
     await setAllureTags('Medium', 'Medium');

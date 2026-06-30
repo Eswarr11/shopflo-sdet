@@ -5,7 +5,7 @@ import { AUTH_FILES } from '../../../config/constants';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
-test.describe('Verify Successful Logout After Login', () => {
+test.describe('Verify Successful Logout After Login', { tag: '@regression' }, () => {
   test.beforeEach(async () => {
     await allure.feature('Login');
   });

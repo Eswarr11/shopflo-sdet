@@ -7,7 +7,7 @@ import { navigateToCheckoutStepOne } from '../../helpers/flow.helper';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
-test.describe('Verify Mandatory Customer Information Validation', () => {
+test.describe('Verify Mandatory Customer Information Validation', { tag: '@regression' }, () => {
   test.beforeEach(async ({ poManager }) => {
     await allure.feature('Checkout');
     await allure.story('Step 1 Validation');

@@ -5,7 +5,7 @@ import { AUTH_FILES, PRODUCTS } from '../../../config/constants';
 
 test.use({ storageState: AUTH_FILES.PERFORMANCE_GLITCH_USER });
 
-test.describe('Verify Cart Page Loads Successfully With Delays', () => {
+test.describe('Verify Cart Page Loads Successfully With Delays', { tag: '@regression' }, () => {
   test('Verify Cart Page Loads Successfully With Delays', async ({ poManager }) => {
     await allure.feature('Checkout');
     await setAllureTags('Medium', 'Medium');

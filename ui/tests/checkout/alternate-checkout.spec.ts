@@ -7,7 +7,7 @@ import { MESSAGES } from '../../../config/messages';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
-test.describe('Verify Alternate Checkout Flow for Standard User', () => {
+test.describe('Verify Alternate Checkout Flow for Standard User', { tag: '@regression' }, () => {
   test('Verify Alternate Checkout Flow for Standard User', async ({ page, poManager }) => {
     await allure.feature('Checkout');
     await setAllureTags('High', 'High');

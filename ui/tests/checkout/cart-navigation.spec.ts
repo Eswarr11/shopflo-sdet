@@ -8,7 +8,7 @@ import { navigateToCheckoutStepTwo } from '../../helpers/flow.helper';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
-test.describe('Verify Cart Navigation From Order Confirmation Page', () => {
+test.describe('Verify Cart Navigation From Order Confirmation Page', { tag: '@regression' }, () => {
   test('Verify Cart Navigation From Order Confirmation Page', async ({ page, poManager }) => {
     await allure.feature('Checkout');
     await setAllureTags('High', 'Medium');

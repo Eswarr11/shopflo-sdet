@@ -11,7 +11,7 @@ import {
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
-test.describe('Reset App State', () => {
+test.describe('Reset App State', { tag: '@regression' }, () => {
   test.beforeEach(async () => {
     await allure.feature('Reset');
   });

@@ -20,7 +20,7 @@ const productTestData: ProductTestCase[] = [
   { productId: 20, quantity: 1, description: 'electronics – SanDisk SSD' },
 ];
 
-test.describe('Cart — Data-driven: create cart for multiple product IDs', () => {
+test.describe('Cart — Data-driven: create cart for multiple product IDs', { tag: '@regression' }, () => {
   for (const { productId, quantity, description } of productTestData) {
     test(`POST /carts with productId=${productId} (${description}) returns a valid cart id`, async () => {
       const payload = buildCart({

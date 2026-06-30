@@ -11,7 +11,7 @@ npm run test:api          # FakeStoreAPI
 npm run test:ui           # SauceDemo UI
 npm run test:all          # API + UI (full suite)
 npm run test:smoke        # @smoke tagged tests
-npm run test:regression   # API + UI regression
+npm run test:regression   # @regression tagged tests (full API + UI suite)
 npm run report            # Generate combined Allure + Playwright HTML reports
 npm run test:all:report   # Run full suite and generate combined reports
 ```
@@ -48,7 +48,8 @@ Set `HEADED=true` in `.env` to run UI tests in headed mode locally (headless by 
 
 - `checkout/validation.spec.ts` — one `test.describe` (`Verify Mandatory Customer Information Validation`) runs as **4 separate tests** (missing first name, last name, postal code, all fields empty).
 - `checkout/e2e.spec.ts` — `Verify Successful End-to-End Checkout for Standard User` clubs the full checkout flow with order-summary price checks (subtotal, per-item prices, total = subtotal + tax). The same pricing rules are also covered in isolation by `checkout/summary.spec.ts`.
-- `@smoke` — tagged on login, add-to-cart, product detail, E2E checkout, and API cart POST.
+- `@smoke` — critical subset: login, add-to-cart, product detail, cart items, E2E checkout, API cart POST.
+- `@regression` — full suite: all **47** UI and **30** API tests (tagged at `test.describe` level; smoke tests inherit both tags).
 
 ### Framework: Playwright v1.61 + TypeScript
 

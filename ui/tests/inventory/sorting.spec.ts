@@ -5,7 +5,7 @@ import { AUTH_FILES } from '../../../config/constants';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
-test.describe('Product Sorting', () => {
+test.describe('Product Sorting', { tag: '@regression' }, () => {
   test.beforeEach(async ({ poManager }) => {
     await allure.feature('Inventory');
     await allure.story('Sorting');
