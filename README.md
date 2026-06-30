@@ -153,21 +153,21 @@ Each affected test calls `markKnownDefect()` from [`helpers/known-defects.helper
 
 ### SauceDemo UI (4 tests)
 
-| Defect ID | Test | Expected | Actual (why it fails) |
-| --------- | ---- | -------- | --------------------- |
-| `SAUCEDEMO-001` | `checkout/problem-user-checkout.spec.ts` — Verify Checkout Completion for Problem User | Problem user completes checkout after filling shipping info | Last name field does not retain input; checkout stays on step one |
-| `SAUCEDEMO-002` | `reset/reset-app-state.spec.ts` — Verify Reset App State From Inventory Page | Cart badge clears and **Add to Cart** buttons are restored | Cart badge clears, but **Remove** buttons remain on products |
-| `SAUCEDEMO-003` | `reset/reset-app-state.spec.ts` — Verify Reset App State From Cart Page | Cart badge clears and cart is empty | Cart badge clears, but **items remain** in the cart |
-| `SAUCEDEMO-004` | `reset/reset-app-state.spec.ts` — Verify Reset App State During Order Overview Step | Order overview shows no items and purchase cannot complete | Cart badge clears, but **items still appear** on order overview and purchase can still finish |
+| Defect ID       | Test                                                                                   | Expected                                                    | Actual (why it fails)                                                                         |
+| --------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `SAUCEDEMO-001` | `checkout/problem-user-checkout.spec.ts` — Verify Checkout Completion for Problem User | Problem user completes checkout after filling shipping info | Last name field does not retain input; checkout stays on step one                             |
+| `SAUCEDEMO-002` | `reset/reset-app-state.spec.ts` — Verify Reset App State From Inventory Page           | Cart badge clears and **Add to Cart** buttons are restored  | Cart badge clears, but **Remove** buttons remain on products                                  |
+| `SAUCEDEMO-003` | `reset/reset-app-state.spec.ts` — Verify Reset App State From Cart Page                | Cart badge clears and cart is empty                         | Cart badge clears, but **items remain** in the cart                                           |
+| `SAUCEDEMO-004` | `reset/reset-app-state.spec.ts` — Verify Reset App State During Order Overview Step    | Order overview shows no items and purchase cannot complete  | Cart badge clears, but **items still appear** on order overview and purchase can still finish |
 
 ### FakeStoreAPI (5 tests)
 
-| Defect ID | Test | Expected | Actual (why it fails) |
-| --------- | ---- | -------- | --------------------- |
-| `FAKESTOREAPI-001` | `security.spec.ts` — GET without / with invalid Bearer token | `401 Unauthorized` | API returns **`200`** — no authentication is enforced |
-| `FAKESTOREAPI-002` | `post-validation.spec.ts` — POST with invalid `productId` | `400` validation error | API returns **`201`** and accepts the payload |
-| `FAKESTOREAPI-003` | `post-validation.spec.ts` — POST with negative quantity | `400` validation error | API returns **`201`** and accepts the payload |
-| `FAKESTOREAPI-004` | `post-validation.spec.ts` — POST without `products` field | `400` validation error | API returns **`201`** and accepts the payload |
+| Defect ID          | Test                                                         | Expected               | Actual (why it fails)                                 |
+| ------------------ | ------------------------------------------------------------ | ---------------------- | ----------------------------------------------------- |
+| `FAKESTOREAPI-001` | `security.spec.ts` — GET without / with invalid Bearer token | `401 Unauthorized`     | API returns **`200`** — no authentication is enforced |
+| `FAKESTOREAPI-002` | `post-validation.spec.ts` — POST with invalid `productId`    | `400` validation error | API returns **`201`** and accepts the payload         |
+| `FAKESTOREAPI-003` | `post-validation.spec.ts` — POST with negative quantity      | `400` validation error | API returns **`201`** and accepts the payload         |
+| `FAKESTOREAPI-004` | `post-validation.spec.ts` — POST without `products` field    | `400` validation error | API returns **`201`** and accepts the payload         |
 
 Run only known-defect tests:
 
