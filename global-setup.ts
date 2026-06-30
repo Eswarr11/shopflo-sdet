@@ -2,11 +2,15 @@ import { chromium, FullConfig, Browser } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 import { USERS, PASSWORD } from './config/constants';
-import { LoginPage } from './ui/pages/login.page';
 
 const AUTH_DIR = path.join(process.cwd(), '.auth');
 const FRESHNESS_MS = 24 * 60 * 60 * 1000;
-const CONTEXT_OPTIONS = { testIdAttribute: 'data-test' } as const;
+
+const LOGIN_SEL = {
+  username:    '//input[@data-test="username"]',
+  password:    '//input[@data-test="password"]',
+  loginButton: '//input[@data-test="login-button"]',
+};
 
 const AUTH_USERS = [
   USERS.STANDARD,
@@ -33,7 +37,7 @@ async function verifyAuthFile(
   baseURL: string,
   authFile: string,
 ): Promise<boolean> {
-  const context = await browser.newContext({ baseURL, storageState: authFile, ...CONTEXT_OPTIONS });
+  const context = await browser.newContext({ baseURL, storageState: authFile });
   const page = await context.newPage();
   await page.goto('/inventory.html');
   const valid = page.url().includes('inventory.html');
@@ -47,12 +51,13 @@ async function loginAndSaveState(
   username: string,
   authFile: string,
 ): Promise<void> {
-  const context = await browser.newContext({ baseURL, ...CONTEXT_OPTIONS });
+  const context = await browser.newContext({ baseURL });
   const page = await context.newPage();
 
-  const loginPage = new LoginPage(page);
-  await loginPage.goto();
-  await loginPage.login(username, PASSWORD);
+  await page.goto(baseURL);
+  await page.locator(LOGIN_SEL.username).fill(username);
+  await page.locator(LOGIN_SEL.password).fill(PASSWORD);
+  await page.locator(LOGIN_SEL.loginButton).click();
   await page.waitForURL('**/inventory.html');
 
   await context.storageState({ path: authFile });
