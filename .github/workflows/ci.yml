@@ -6,17 +6,18 @@ on:
   pull_request:
     branches: [main, master]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
+
 permissions:
   contents: read
   actions: write
-  pages: write
-  id-token: write
 
 env:
   API_BASE_URL: https://fakestoreapi.com
   UI_BASE_URL: https://www.saucedemo.com
   PLAYWRIGHT_IMAGE: mcr.microsoft.com/playwright:v1.61.1-noble
-  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
 jobs:
   setup-auth:
@@ -25,8 +26,17 @@ jobs:
     timeout-minutes: 30
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
       - uses: actions/checkout@v4
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-npm-
 
       - name: Install dependencies
         run: npm ci
@@ -56,7 +66,6 @@ jobs:
     timeout-minutes: 60
     strategy:
       fail-fast: false
-      max-parallel: 2
       matrix:
         shard: [1, 2, 3, 4, 5]
     env:
@@ -97,7 +106,7 @@ jobs:
   merge-api-reports:
     name: Merge API reports
     needs: api-tests
-    if: always()
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -166,6 +175,7 @@ jobs:
     env:
       CI: true
       WORKERS: '2'
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
       - uses: actions/checkout@v4
 
@@ -179,6 +189,13 @@ jobs:
         run: |
           ls -la .auth/
           test "$(find .auth -name '*.json' | wc -l)" -ge 1
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-npm-
 
       - name: Install dependencies
         run: npm ci
@@ -207,7 +224,7 @@ jobs:
   merge-ui-reports:
     name: Merge UI reports
     needs: ui-tests
-    if: always()
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -244,11 +261,9 @@ jobs:
 
       - name: Merge Playwright reports
         run: npx playwright merge-reports --reporter html ./all-blob-reports
-        continue-on-error: true
 
       - name: Generate Allure report
         run: npx allure generate combined-allure-results --clean -o allure-report
-        continue-on-error: true
 
       - name: Upload merged UI reports
         if: always()
@@ -266,6 +281,9 @@ jobs:
     needs: [merge-api-reports, merge-ui-reports]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

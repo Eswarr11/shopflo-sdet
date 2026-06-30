@@ -165,7 +165,9 @@ Pin `PLAYWRIGHT_IMAGE` in `ci.yml` to match `@playwright/test` in `package.json`
 
 ### GitHub Pages
 
-On push to `main` or `master`, the `deploy-pages` job publishes merged reports. Enable it once in the repo:
+On push to `main` or `master`, the `deploy-pages` job publishes merged reports. **Pull request runs skip deploy** (GitHub Pages only updates from direct pushes). You can also trigger deploy manually via **Actions → Playwright Tests → Run workflow**.
+
+Enable it once in the repo:
 
 **Settings → Pages → Build and deployment → Source: GitHub Actions**
 
