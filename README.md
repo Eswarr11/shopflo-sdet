@@ -145,31 +145,52 @@ await this.actions.click(item.locator('button'), `Add to cart — ${productName}
 
 ## Known Defects
 
-**9 tests** assert **expected product behavior** but fail because of **bugs or limitations in the demo applications** (SauceDemo and FakeStoreAPI), not because of automation issues. These are documented in the [SauceDemo test cases spreadsheet](https://docs.google.com/spreadsheets/d/1jK9cAb_C6vVrr4h8FTc8oyGkygmwP6a_Y01s3_4vydQ/edit?usp=sharing) and [FakeStoreAPI test cases spreadsheet](https://docs.google.com/spreadsheets/d/1NbomKcn3HD95l9FbgWy1MYpOcaYueGE7iSy4OHucJWE/edit?usp=sharing) with `Status: Failed`.
+**9 tests** assert **expected product behavior** from the manual test case spreadsheets, but the **demo applications do not meet that expected behavior**. These are **not automation bugs** — the tests correctly detect real defects in SauceDemo and FakeStoreAPI.
 
-Each affected test calls `markKnownDefect()` from [`helpers/known-defects.helper.ts`](helpers/known-defects.helper.ts), which uses Playwright’s `test.fail()` so the suite still passes in CI while continuing to assert the correct expected outcome. Tests are tagged `@known-defect` and labeled in Allure with the defect ID.
+Source of truth (manual execution `Status: Failed`):
 
-**When an application fix lands**, the test will start **passing unexpectedly** (because `test.fail()` expects failure) — remove the `markKnownDefect()` call and the `@known-defect` tag for that test.
+- [SauceDemo test cases spreadsheet](https://docs.google.com/spreadsheets/d/1jK9cAb_C6vVrr4h8FTc8oyGkygmwP6a_Y01s3_4vydQ/edit?usp=sharing)
+- [FakeStoreAPI test cases spreadsheet](https://docs.google.com/spreadsheets/d/1NbomKcn3HD95l9FbgWy1MYpOcaYueGE7iSy4OHucJWE/edit?usp=sharing)
+
+### Why they show as **Passed** in CI and reports
+
+Each affected test calls `markKnownDefect()` from [`helpers/known-defects.helper.ts`](helpers/known-defects.helper.ts), which invokes Playwright’s [`test.fail()`](https://playwright.dev/docs/test-annotations#test-fail):
+
+```typescript
+test.fail(true, `[${defect.id}] ${defect.summary}`);
+```
+
+| What happens               | Detail                                                                                                                                                                     |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Assertion outcome**      | The test **does fail logically** — the assertion does not match actual app/API behavior (see tables below).                                                                |
+| **Playwright / CI result** | Because failure was **expected**, Playwright marks the test **Passed** so the **CI pipeline does not fail** on known third-party demo bugs.                                |
+| **Allure result**          | Allure-playwright maps an expected failure to **Passed** for the same reason.                                                                                              |
+| **How to find them**       | Filter by tag `@known-defect` or Allure label `known-defect` (e.g. `SAUCEDEMO-001`). Step-level failure details are still visible inside the test body in Allure / traces. |
+
+This is intentional: automation keeps asserting the **correct expected outcome** (so defects stay documented and will be caught if the app is fixed), while CI stays green for defects outside our control.
+
+**When an application fix lands**, the assertion will start passing while `test.fail()` still expects failure — the test will flip to **Failed** in CI. That is the signal to remove `markKnownDefect()` and the `@known-defect` tag for that test.
 
 ### SauceDemo UI (4 tests)
 
-| Defect ID       | Test                                                                                   | Expected                                                    | Actual (why it fails)                                                                         |
-| --------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `SAUCEDEMO-001` | `checkout/problem-user-checkout.spec.ts` — Verify Checkout Completion for Problem User | Problem user completes checkout after filling shipping info | Last name field does not retain input; checkout stays on step one                             |
-| `SAUCEDEMO-002` | `reset/reset-app-state.spec.ts` — Verify Reset App State From Inventory Page           | Cart badge clears and **Add to Cart** buttons are restored  | Cart badge clears, but **Remove** buttons remain on products                                  |
-| `SAUCEDEMO-003` | `reset/reset-app-state.spec.ts` — Verify Reset App State From Cart Page                | Cart badge clears and cart is empty                         | Cart badge clears, but **items remain** in the cart                                           |
-| `SAUCEDEMO-004` | `reset/reset-app-state.spec.ts` — Verify Reset App State During Order Overview Step    | Order overview shows no items and purchase cannot complete  | Cart badge clears, but **items still appear** on order overview and purchase can still finish |
+| Defect ID       | Test                                             | Expected                               | Actual app behavior                                                    | Failing assertion (evidence)                                                                                  |
+| --------------- | ------------------------------------------------ | -------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `SAUCEDEMO-001` | `checkout/problem-user-checkout.spec.ts`         | Problem user completes checkout        | Last name input does not retain value; checkout never reaches step two | `getLastNameValue()` ≠ filled last name, or URL stays on `/checkout-step-one` instead of `/checkout-step-two` |
+| `SAUCEDEMO-002` | `reset/reset-app-state.spec.ts` — From Inventory | Reset restores **Add to Cart** buttons | Cart badge clears, but **Remove** buttons stay on products             | `isAddToCartShownForProduct()` is `false` / `isRemoveShownForProduct()` is `true` after reset                 |
+| `SAUCEDEMO-003` | `reset/reset-app-state.spec.ts` — From Cart      | Reset empties the cart                 | Cart badge clears, but line items remain                               | `getCartItemCount()` returns `2` (expected `0`) after reset                                                   |
+| `SAUCEDEMO-004` | `reset/reset-app-state.spec.ts` — Order Overview | Reset clears order overview            | Badge clears, but items still listed and purchase can finish           | `getItemCount()` returns `1` (expected `0`) on checkout step two after reset                                  |
 
 ### FakeStoreAPI (5 tests)
 
-| Defect ID          | Test                                                         | Expected               | Actual (why it fails)                                 |
-| ------------------ | ------------------------------------------------------------ | ---------------------- | ----------------------------------------------------- |
-| `FAKESTOREAPI-001` | `security.spec.ts` — GET without / with invalid Bearer token | `401 Unauthorized`     | API returns **`200`** — no authentication is enforced |
-| `FAKESTOREAPI-002` | `post-validation.spec.ts` — POST with invalid `productId`    | `400` validation error | API returns **`201`** and accepts the payload         |
-| `FAKESTOREAPI-003` | `post-validation.spec.ts` — POST with negative quantity      | `400` validation error | API returns **`201`** and accepts the payload         |
-| `FAKESTOREAPI-004` | `post-validation.spec.ts` — POST without `products` field    | `400` validation error | API returns **`201`** and accepts the payload         |
+| Defect ID          | Test                                                   | Expected               | Actual API behavior                                         | Failing assertion (evidence)                                                |
+| ------------------ | ------------------------------------------------------ | ---------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `FAKESTOREAPI-001` | `security.spec.ts` — no token                          | `401 Unauthorized`     | `GET /carts` returns **`200`** with data — no auth enforced | `assertApiErrorStatus(..., 401)` — request succeeds instead of throwing 401 |
+| `FAKESTOREAPI-001` | `security.spec.ts` — invalid token                     | `401 Unauthorized`     | Same — invalid Bearer token still returns **`200`**         | `assertApiErrorStatus(..., 401)` — request succeeds instead of throwing 401 |
+| `FAKESTOREAPI-002` | `post-validation.spec.ts` — invalid `productId: 99999` | `400` validation error | API returns **`201 Created`**                               | `assertApiErrorStatus(..., 400)` — create succeeds for non-existent product |
+| `FAKESTOREAPI-003` | `post-validation.spec.ts` — negative quantity          | `400` validation error | API returns **`201 Created`**                               | `assertApiErrorStatus(..., 400)` — create succeeds with `quantity: -1`      |
+| `FAKESTOREAPI-004` | `post-validation.spec.ts` — missing `products`         | `400` validation error | API returns **`201 Created`**                               | `assertApiErrorStatus(..., 400)` — create succeeds without `products` field |
 
-Run only known-defect tests:
+Run only known-defect tests (assertions fail; results show **Passed** due to `test.fail()`):
 
 ```bash
 npx playwright test --grep @known-defect

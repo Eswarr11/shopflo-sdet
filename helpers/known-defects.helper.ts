@@ -43,4 +43,7 @@ export async function markKnownDefect(key: KnownDefectKey): Promise<void> {
   test.fail(true, `[${defect.id}] ${defect.summary}`);
   await allure.label('known-defect', defect.id);
   await allure.tag('known-defect');
+  await allure.description(
+    `Known application defect [${defect.id}]: ${defect.summary}. Assertion fails against demo app/API behavior; test is marked Passed in CI via test.fail().`,
+  );
 }
