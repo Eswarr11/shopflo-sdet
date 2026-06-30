@@ -1,0 +1,13 @@
+node_modules/
+logs/
+reports/
+.env
+playwright-report/
+test-results/
+.auth/
+allure-results/
+
+# Playwright
+/playwright-report/
+/playwright/.cache/
+/playwright/.auth/

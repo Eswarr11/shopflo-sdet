@@ -1,0 +1,31 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "FakeStoreAPI /carts response shape contract. This file is the source of truth. Any structural change to the API response must be reflected here via a deliberate commit — a diff in this file signals a breaking contract change.",
+    "captured_from": "https://fakestoreapi.com/carts/1",
+    "captured_at": "2024-01-01"
+  },
+  "cart": {
+    "id": "number",
+    "userId": "number",
+    "date": "string",
+    "products": "array"
+  },
+  "cart.products[*]": {
+    "productId": "number",
+    "quantity": "number"
+  },
+  "cartList": "array",
+  "requiredFields": ["id", "userId", "date", "products"],
+  "productItemRequiredFields": ["productId", "quantity"],
+  "sample": {
+    "id": 1,
+    "userId": 1,
+    "date": "2020-03-02T00:00:00.000Z",
+    "products": [
+      { "productId": 6, "quantity": 1 },
+      { "productId": 9, "quantity": 1 },
+      { "productId": 11, "quantity": 3 }
+    ]
+  }
+}

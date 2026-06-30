@@ -1,0 +1,67 @@
+import { allure } from 'allure-playwright';
+import { test, expect } from '../../../fixtures/ui.fixture';
+import { PRODUCTS, AUTH_FILES } from '../../../config/constants';
+
+test.use({ storageState: AUTH_FILES.STANDARD_USER });
+
+test.describe('Product detail page', () => {
+  test.beforeEach(async () => {
+    await allure.feature('Inventory');
+    await allure.story('Product Detail');
+  });
+
+  test('clicking product name opens detail page with all elements visible', { tag: '@smoke' }, async ({ page, poManager }) => {
+    await allure.step('Open product detail page from inventory', async () => {
+      const inventory = poManager.getInventoryPage();
+      await inventory.goto();
+      await inventory.clickProduct(PRODUCTS.BACKPACK.name);
+      await expect(page).toHaveURL(/inventory-item/);
+    });
+    await allure.step('Verify description and add-to-cart button are visible', async () => {
+      const detail = poManager.getProductDetailPage();
+      expect(await detail.isDescriptionVisible()).toBe(true);
+      expect(await detail.isAddToCartButtonVisible()).toBe(true);
+    });
+  });
+
+  test('product detail shows correct name and price', async ({ poManager }) => {
+    await allure.step('Verify product name, price, and description on detail page', async () => {
+      const inventory = poManager.getInventoryPage();
+      await inventory.goto();
+      await inventory.clickProduct(PRODUCTS.BACKPACK.name);
+      const detail = poManager.getProductDetailPage();
+      expect(await detail.getProductName()).toContain(PRODUCTS.BACKPACK.name);
+      expect(await detail.getProductPrice()).toBe(PRODUCTS.BACKPACK.price);
+      expect(await detail.isDescriptionVisible()).toBe(true);
+    });
+  });
+
+  test('add to cart from detail page increments badge and shows remove button', async ({ poManager }) => {
+    await allure.step('Add product from detail page and verify cart state', async () => {
+      const inventory = poManager.getInventoryPage();
+      await inventory.goto();
+      await inventory.clickProduct(PRODUCTS.FLEECE_JACKET.name);
+      const detail = poManager.getProductDetailPage();
+      expect(await detail.isAddToCartButtonVisible()).toBe(true);
+      await detail.addToCart();
+      expect(await detail.isRemoveButtonVisible()).toBe(true);
+      expect(await detail.isAddToCartButtonVisible()).toBe(false);
+      expect(await inventory.getCartBadgeCount()).toBe(1);
+    });
+  });
+
+  test('back button returns to inventory with all products visible', async ({ page, poManager }) => {
+    await allure.step('Navigate back from detail page to inventory', async () => {
+      const inventory = poManager.getInventoryPage();
+      await inventory.goto();
+      await inventory.clickProduct(PRODUCTS.ONESIE.name);
+      await poManager.getProductDetailPage().goBack();
+      await expect(page).toHaveURL(/inventory\.html/);
+    });
+    await allure.step('Verify all 6 products are visible on inventory', async () => {
+      const inventory = poManager.getInventoryPage();
+      expect(await inventory.isPageTitleVisible()).toBe(true);
+      expect(await inventory.getProductCount()).toBe(6);
+    });
+  });
+});

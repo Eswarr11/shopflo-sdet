@@ -1,0 +1,185 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+env:
+  TOTAL_SHARDS: '5'
+  WORKERS: '2'
+  PLAYWRIGHT_IMAGE: mcr.microsoft.com/playwright:v1.61.1-jammy
+
+jobs:
+  setup-auth:
+    name: Generate auth sessions
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-jammy
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run global setup
+        run: npx ts-node scripts/run-auth-setup.ts
+        env:
+          CI: true
+
+      - name: Upload auth state
+        uses: actions/upload-artifact@v4
+        with:
+          name: auth-state
+          path: .auth/
+          retention-days: 1
+
+  api-tests:
+    name: API shard ${{ matrix.shard }}/${{ env.TOTAL_SHARDS }}
+    runs-on: ubuntu-latest
+    container:
+      image: node:20-bookworm
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run API tests
+        run: npm run test:api
+        env:
+          CI: true
+          CURRENT_SHARD: ${{ matrix.shard }}
+          TOTAL_SHARDS: ${{ env.TOTAL_SHARDS }}
+          WORKERS: ${{ env.WORKERS }}
+
+      - name: Upload API shard reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-shard-${{ matrix.shard }}
+          path: reports/
+          retention-days: 1
+
+  merge-api-reports:
+    name: Merge API reports
+    needs: api-tests
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download API shard reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: api-shard-*
+          merge-multiple: true
+          path: reports
+
+      - name: Merge Playwright HTML reports
+        run: npx playwright merge-reports --reporter html reports/blob/shard-*
+        continue-on-error: true
+
+      - name: Generate merged Allure report
+        run: npm run report:allure
+        continue-on-error: true
+
+      - name: Upload merged API reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-reports-${{ github.run_number }}
+          path: reports/
+          retention-days: 14
+
+  ui-tests:
+    name: UI shard ${{ matrix.shard }}/${{ env.TOTAL_SHARDS }}
+    needs: setup-auth
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-jammy
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download auth state
+        uses: actions/download-artifact@v4
+        with:
+          name: auth-state
+          path: .auth/
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run UI tests
+        run: npm run test:ui
+        env:
+          CI: true
+          CURRENT_SHARD: ${{ matrix.shard }}
+          TOTAL_SHARDS: ${{ env.TOTAL_SHARDS }}
+          WORKERS: ${{ env.WORKERS }}
+
+      - name: Upload UI shard reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-shard-${{ matrix.shard }}
+          path: reports/
+          retention-days: 1
+
+  merge-ui-reports:
+    name: Merge UI reports
+    needs: ui-tests
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download UI shard reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ui-shard-*
+          merge-multiple: true
+          path: reports
+
+      - name: Merge Playwright HTML reports
+        run: npx playwright merge-reports --reporter html reports/blob/shard-*
+        continue-on-error: true
+
+      - name: Generate merged Allure report
+        run: npm run report:allure
+        continue-on-error: true
+
+      - name: Upload merged UI reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-reports-${{ github.run_number }}
+          path: reports/
+          retention-days: 14

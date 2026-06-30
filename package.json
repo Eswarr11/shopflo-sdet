@@ -1,0 +1,28 @@
+{
+  "name": "automation-suite",
+  "version": "1.0.0",
+  "description": "API + UI automation for SauceDemo & FakeStoreAPI",
+  "scripts": {
+    "test:ui": "playwright test ui/tests --project=ui",
+    "test:api": "playwright test api/tests --project=api",
+    "test:all": "playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:regression": "playwright test --project=api --project=ui",
+    "report:allure": "node scripts/generate-allure-report.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "winston": "^3.13.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.0.1",
+    "allure-commandline": "^2.43.0",
+    "allure-playwright": "^3.10.2",
+    "dotenv": "^16.4.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}
