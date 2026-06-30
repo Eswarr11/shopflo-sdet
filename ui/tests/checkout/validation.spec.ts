@@ -1,4 +1,5 @@
 import * as allure from 'allure-js-commons';
+import { setAllureTags } from '../../../helpers/allure-tags.helper';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { PRODUCTS, AUTH_FILES } from '../../../config/constants';
 import { MESSAGES } from '../../../config/messages';
@@ -10,6 +11,7 @@ test.describe('Verify Mandatory Customer Information Validation', () => {
   test.beforeEach(async ({ poManager }) => {
     await allure.feature('Checkout');
     await allure.story('Step 1 Validation');
+    await setAllureTags('High', 'High');
     await navigateToCheckoutStepOne(poManager, [PRODUCTS.BACKPACK.name]);
     expect(await poManager.getCheckoutStepOnePage().isErrorVisible()).toBe(false);
   });

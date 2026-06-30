@@ -1,4 +1,5 @@
 import * as allure from 'allure-js-commons';
+import { setAllureTags } from '../../../helpers/allure-tags.helper';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { PRODUCTS, AUTH_FILES } from '../../../config/constants';
 
@@ -11,6 +12,7 @@ test.describe('Product detail page', () => {
   });
 
   test('Verify Product Detail Page Elements Visible', { tag: '@smoke' }, async ({ page, poManager }) => {
+    await setAllureTags('High', 'High');
     await allure.step('Open product detail page from inventory', async () => {
       const inventory = poManager.getInventoryPage();
       await inventory.goto();
@@ -25,6 +27,7 @@ test.describe('Product detail page', () => {
   });
 
   test('Verify Product Detail Shows Correct Name and Price', async ({ poManager }) => {
+    await setAllureTags('High', 'Medium');
     await allure.step('Verify product name, price, and description on detail page', async () => {
       const inventory = poManager.getInventoryPage();
       await inventory.goto();
@@ -37,6 +40,7 @@ test.describe('Product detail page', () => {
   });
 
   test('Verify Add to Cart From Product Detail Page', async ({ poManager }) => {
+    await setAllureTags('High', 'High');
     await allure.step('Add product from detail page and verify cart state', async () => {
       const inventory = poManager.getInventoryPage();
       await inventory.goto();
@@ -51,6 +55,7 @@ test.describe('Product detail page', () => {
   });
 
   test('Verify Back Button Returns to Inventory', async ({ page, poManager }) => {
+    await setAllureTags('Medium', 'Medium');
     await allure.step('Navigate back from detail page to inventory', async () => {
       const inventory = poManager.getInventoryPage();
       await inventory.goto();

@@ -1,4 +1,5 @@
 import * as allure from 'allure-js-commons';
+import { setAllureTags } from '../../../helpers/allure-tags.helper';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { buildCheckoutInfo, pickRandomProductNames } from '../../../helpers/data.helper';
 import { AUTH_FILES, PRODUCTS } from '../../../config/constants';
@@ -11,7 +12,7 @@ test.describe('Checkout E2E', () => {
   test('Verify Successful End-to-End Checkout for Standard User', { tag: '@smoke' }, async ({ page, poManager }) => {
     await allure.feature('Checkout');
     await allure.story('E2E');
-    await allure.severity('critical');
+    await setAllureTags('Critical', 'Critical');
 
     const productNames = Object.values(PRODUCTS).map(product => product.name);
     const numProducts = Math.floor(Math.random() * productNames.length) + 1;
@@ -97,6 +98,7 @@ test.describe('Checkout E2E', () => {
   test('Verify Removed Inventory Items Do Not Appear in Checkout Flow', async ({ page, poManager }) => {
     await allure.feature('Cart');
     await allure.story('E2E');
+    await setAllureTags('High', 'High');
 
     const addedProducts = [
       PRODUCTS.BACKPACK.name,
@@ -198,6 +200,7 @@ test.describe('Checkout E2E', () => {
   test('Verify User Can Add More Products and Complete Checkout After Reaching Order Overview', async ({ page, poManager }) => {
     await allure.feature('Checkout');
     await allure.story('E2E');
+    await setAllureTags('High', 'High');
 
     const initialProducts = [PRODUCTS.BACKPACK.name];
     const additionalProducts = [PRODUCTS.BIKE_LIGHT.name, PRODUCTS.ONESIE.name];

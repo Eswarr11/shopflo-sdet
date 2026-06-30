@@ -1,4 +1,5 @@
 import * as allure from 'allure-js-commons';
+import { setAllureTags } from '../../../helpers/allure-tags.helper';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { AUTH_FILES } from '../../../config/constants';
 
@@ -10,6 +11,7 @@ test.describe('Verify Successful Logout After Login', () => {
   });
 
   test('Verify Successful Logout After Login', async ({ page, poManager }) => {
+    await setAllureTags('High', 'High');
     await allure.step('Navigate to inventory as logged-in user', async () => {
       await poManager.getInventoryPage().goto();
       expect(await poManager.getInventoryPage().isPageTitleVisible()).toBe(true);

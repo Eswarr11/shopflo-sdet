@@ -1,4 +1,5 @@
 import * as allure from 'allure-js-commons';
+import { setAllureTags } from '../../../helpers/allure-tags.helper';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { buildCheckoutInfo } from '../../../helpers/data.helper';
 import { PRODUCTS, AUTH_FILES } from '../../../config/constants';
@@ -13,6 +14,7 @@ test.describe('Order summary accuracy', () => {
   });
 
   test('Verify Order Summary Subtotal Matches Product Prices', async ({ page, poManager }) => {
+    await setAllureTags('High', 'Medium');
     await allure.step('Navigate to checkout step two with two products', async () => {
       await navigateToCheckoutStepTwo(
         page,
@@ -36,6 +38,7 @@ test.describe('Order summary accuracy', () => {
   });
 
   test('Verify Order Total Equals Subtotal Plus Tax', async ({ page, poManager }) => {
+    await setAllureTags('High', 'Medium');
     await allure.step('Navigate to checkout step two with one product', async () => {
       await navigateToCheckoutStepTwo(
         page,

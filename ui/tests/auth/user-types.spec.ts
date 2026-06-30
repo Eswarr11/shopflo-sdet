@@ -1,4 +1,5 @@
 import * as allure from 'allure-js-commons';
+import { setAllureTags } from '../../../helpers/allure-tags.helper';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { USERS, PASSWORD, AUTH_FILES, PRODUCT_IMAGE_SLUGS } from '../../../config/constants';
 
@@ -9,6 +10,7 @@ test.describe('User type behaviors', () => {
     test('Verify Inventory Page Loads Successfully With Delays', async ({ page, poManager }) => {
       await allure.feature('Checkout');
       await allure.story('User Types');
+      await setAllureTags('Medium', 'Medium');
       const login = poManager.getLoginPage();
       await allure.step('Measure login duration for performance_glitch_user', async () => {
         await login.goto();
@@ -32,6 +34,7 @@ test.describe('User type behaviors', () => {
     test('Verify Problem User Product Images Are Mismatched', async ({ page, poManager }) => {
       await allure.feature('Authentication');
       await allure.story('User Types');
+      await setAllureTags('Medium', 'Medium');
       await allure.step('Log in as problem_user and open inventory', async () => {
         const login = poManager.getLoginPage();
         await login.goto();
@@ -53,6 +56,7 @@ test.describe('User type behaviors', () => {
     test('Verify Visual User Can Access Inventory', async ({ poManager }) => {
       await allure.feature('Authentication');
       await allure.story('User Types');
+      await setAllureTags('Low', 'Low');
       await allure.step('Navigate to inventory as visual_user', async () => {
         await poManager.getInventoryPage().goto();
       });
@@ -70,6 +74,7 @@ test.describe('User type behaviors', () => {
     test('Verify Error User Can Access Inventory', async ({ poManager }) => {
       await allure.feature('Authentication');
       await allure.story('User Types');
+      await setAllureTags('Low', 'Low');
       await allure.step('Navigate to inventory as error_user', async () => {
         await poManager.getInventoryPage().goto();
       });

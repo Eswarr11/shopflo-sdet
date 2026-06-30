@@ -1,4 +1,5 @@
 import * as allure from 'allure-js-commons';
+import { setAllureTags } from '../../../helpers/allure-tags.helper';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { AUTH_FILES, PRODUCTS } from '../../../config/constants';
 
@@ -7,6 +8,7 @@ test.use({ storageState: AUTH_FILES.PERFORMANCE_GLITCH_USER });
 test.describe('Verify Cart Page Loads Successfully With Delays', () => {
   test('Verify Cart Page Loads Successfully With Delays', async ({ poManager }) => {
     await allure.feature('Checkout');
+    await setAllureTags('Medium', 'Medium');
     await allure.step('Add products to cart from inventory page', async () => {
       const inventory = poManager.getInventoryPage();
       await inventory.goto();

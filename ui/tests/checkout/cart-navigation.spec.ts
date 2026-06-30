@@ -1,4 +1,5 @@
 import * as allure from 'allure-js-commons';
+import { setAllureTags } from '../../../helpers/allure-tags.helper';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { buildCheckoutInfo } from '../../../helpers/data.helper';
 import { AUTH_FILES, PRODUCTS } from '../../../config/constants';
@@ -10,6 +11,7 @@ test.use({ storageState: AUTH_FILES.STANDARD_USER });
 test.describe('Verify Cart Navigation From Order Confirmation Page', () => {
   test('Verify Cart Navigation From Order Confirmation Page', async ({ page, poManager }) => {
     await allure.feature('Checkout');
+    await setAllureTags('High', 'Medium');
     const productNames = [PRODUCTS.BACKPACK.name, PRODUCTS.BIKE_LIGHT.name];
     const checkoutInfo = buildCheckoutInfo();
 

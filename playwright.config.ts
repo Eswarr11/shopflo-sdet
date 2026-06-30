@@ -66,7 +66,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         baseURL: process.env.UI_BASE_URL || 'https://www.saucedemo.com',
-        headless: false, // process.env.HEADED !== 'true',
+        headless:  process.env.HEADED !== 'true',
       },
     },
   ],

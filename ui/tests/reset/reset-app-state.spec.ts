@@ -1,4 +1,5 @@
 import * as allure from 'allure-js-commons';
+import { setAllureTags } from '../../../helpers/allure-tags.helper';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { buildCheckoutInfo } from '../../../helpers/data.helper';
 import { AUTH_FILES, PRODUCTS } from '../../../config/constants';
@@ -16,6 +17,7 @@ test.describe('Reset App State', () => {
   });
 
   test('Verify Reset App State From Inventory Page', async ({ poManager }) => {
+    await setAllureTags('Medium', 'High');
     const products = [PRODUCTS.BACKPACK.name, PRODUCTS.BIKE_LIGHT.name];
 
     await allure.step('Add products from inventory page', async () => {
@@ -42,6 +44,7 @@ test.describe('Reset App State', () => {
   });
 
   test('Verify Reset App State From Cart Page', async ({ poManager }) => {
+    await setAllureTags('Medium', 'High');
     const products = [PRODUCTS.BACKPACK.name, PRODUCTS.BOLT_TSHIRT.name];
 
     await allure.step('Add products and open cart page', async () => {
@@ -62,6 +65,7 @@ test.describe('Reset App State', () => {
   });
 
   test('Verify Reset App State During Checkout Information Step', async ({ page, poManager }) => {
+    await setAllureTags('Medium', 'Medium');
     const checkoutInfo = buildCheckoutInfo();
 
     await allure.step('Add products and proceed to checkout information page', async () => {
@@ -90,6 +94,7 @@ test.describe('Reset App State', () => {
   });
 
   test('Verify Reset App State During Order Overview Step', async ({ page, poManager }) => {
+    await setAllureTags('Medium', 'High');
     await allure.step('Add products and proceed to order overview', async () => {
       await addProductsToCart(poManager, [PRODUCTS.BACKPACK.name]);
       await poManager.getInventoryPage().goToCart();

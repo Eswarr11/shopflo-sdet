@@ -1,4 +1,5 @@
 import * as allure from 'allure-js-commons';
+import { setAllureTags } from '../../../helpers/allure-tags.helper';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { USERS, PASSWORD } from '../../../config/constants';
 import { MESSAGES } from '../../../config/messages';
@@ -14,7 +15,7 @@ test.describe('Login', () => {
 
   test.describe('Positive', () => {
     test('Verify Standard User Can Access Inventory After Login', { tag: '@smoke' }, async ({ page, poManager }) => {
-      await allure.severity('critical');
+      await setAllureTags('Critical', 'Critical');
       await allure.step('Log in with standard_user credentials', async () => {
         await poManager.getLoginPage().login(USERS.STANDARD, PASSWORD);
       });
@@ -29,7 +30,7 @@ test.describe('Login', () => {
 
   test.describe('Negative', () => {
     test('Verify Locked-Out User Cannot Log In', async ({ page, poManager }) => {
-      await allure.severity('normal');
+      await setAllureTags('High', 'Critical');
       const loginPage = poManager.getLoginPage();
       await allure.step('Attempt login with locked_out_user', async () => {
         await loginPage.login(USERS.LOCKED, PASSWORD);
@@ -42,6 +43,7 @@ test.describe('Login', () => {
     });
 
     test('Verify Wrong Password Shows Credentials Error', async ({ page, poManager }) => {
+      await setAllureTags('High', 'High');
       const loginPage = poManager.getLoginPage();
       await allure.step('Attempt login with wrong password', async () => {
         await loginPage.login(USERS.STANDARD, 'wrong_password');
@@ -54,6 +56,7 @@ test.describe('Login', () => {
     });
 
     test('Verify Empty Username Shows Required Error', async ({ page, poManager }) => {
+      await setAllureTags('Medium', 'Medium');
       const loginPage = poManager.getLoginPage();
       await allure.step('Submit login with empty username', async () => {
         await loginPage.login('', PASSWORD);
@@ -66,6 +69,7 @@ test.describe('Login', () => {
     });
 
     test('Verify Empty Password Shows Required Error', async ({ page, poManager }) => {
+      await setAllureTags('Medium', 'Medium');
       const loginPage = poManager.getLoginPage();
       await allure.step('Submit login with empty password', async () => {
         await loginPage.login(USERS.STANDARD, '');
@@ -78,6 +82,7 @@ test.describe('Login', () => {
     });
 
     test('Verify Both Fields Empty Shows Username Required First', async ({ page, poManager }) => {
+      await setAllureTags('Medium', 'Low');
       const loginPage = poManager.getLoginPage();
       await allure.step('Submit login with both fields empty', async () => {
         await loginPage.login('', '');

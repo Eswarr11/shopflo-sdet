@@ -1,4 +1,5 @@
 import * as allure from 'allure-js-commons';
+import { setAllureTags } from '../../../helpers/allure-tags.helper';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { PRODUCTS, AUTH_FILES } from '../../../config/constants';
 import { addProductsToCart } from '../../helpers/flow.helper';
@@ -12,6 +13,7 @@ test.describe('Cart operations', () => {
 
   test('Verify Added Products Appear in Cart', { tag: '@smoke' }, async ({ poManager }) => {
     await allure.story('Cart Items');
+    await setAllureTags('High', 'Critical');
     await allure.step('Add two products and open cart', async () => {
       await addProductsToCart(poManager, [PRODUCTS.BACKPACK.name, PRODUCTS.BIKE_LIGHT.name]);
       expect(await poManager.getInventoryPage().getCartBadgeCount()).toBe(2);
@@ -29,6 +31,7 @@ test.describe('Cart operations', () => {
 
   test('Verify Removing Item Updates Cart Count', async ({ poManager }) => {
     await allure.story('Remove Item');
+    await setAllureTags('High', 'Medium');
     await allure.step('Add two products and remove one from cart', async () => {
       await addProductsToCart(poManager, [PRODUCTS.BACKPACK.name, PRODUCTS.BOLT_TSHIRT.name]);
       await poManager.getInventoryPage().goToCart();
@@ -44,6 +47,7 @@ test.describe('Cart operations', () => {
 
   test('Verify Continue Shopping Returns to Inventory', async ({ page, poManager }) => {
     await allure.story('Continue Shopping');
+    await setAllureTags('Medium', 'Medium');
     await allure.step('Open cart and click continue shopping', async () => {
       await poManager.getInventoryPage().goto();
       await poManager.getInventoryPage().goToCart();
@@ -61,6 +65,7 @@ test.describe('Cart operations', () => {
 
   test('Verify Empty Cart Shows No Items', async ({ poManager }) => {
     await allure.story('Empty Cart');
+    await setAllureTags('Medium', 'Medium');
     await allure.step('Navigate to empty cart page', async () => {
       await poManager.getCartPage().goto();
     });

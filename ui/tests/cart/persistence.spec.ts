@@ -1,4 +1,5 @@
 import * as allure from 'allure-js-commons';
+import { setAllureTags } from '../../../helpers/allure-tags.helper';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { PRODUCTS, AUTH_FILES } from '../../../config/constants';
 
@@ -11,6 +12,7 @@ test.describe('Cart persistence', () => {
   });
 
   test('Verify Cart Persists After Page Reload', async ({ page, poManager }) => {
+    await setAllureTags('High', 'Medium');
     await allure.step('Add product to cart and reload page', async () => {
       const inventory = poManager.getInventoryPage();
       await inventory.goto();

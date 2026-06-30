@@ -1,4 +1,5 @@
 import * as allure from 'allure-js-commons';
+import { setAllureTags } from '../../../helpers/allure-tags.helper';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { buildCheckoutInfo } from '../../../helpers/data.helper';
 import { AUTH_FILES, PRODUCTS } from '../../../config/constants';
@@ -9,6 +10,7 @@ test.use({ storageState: AUTH_FILES.STANDARD_USER });
 test.describe('Verify Alternate Checkout Flow for Standard User', () => {
   test('Verify Alternate Checkout Flow for Standard User', async ({ page, poManager }) => {
     await allure.feature('Checkout');
+    await setAllureTags('High', 'High');
     const checkoutInfo = buildCheckoutInfo();
 
     await allure.step('Open product detail page and add product to cart', async () => {

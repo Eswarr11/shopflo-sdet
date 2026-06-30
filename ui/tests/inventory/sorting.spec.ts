@@ -1,4 +1,5 @@
 import * as allure from 'allure-js-commons';
+import { setAllureTags } from '../../../helpers/allure-tags.helper';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { AUTH_FILES } from '../../../config/constants';
 
@@ -8,6 +9,7 @@ test.describe('Product Sorting', () => {
   test.beforeEach(async ({ poManager }) => {
     await allure.feature('Inventory');
     await allure.story('Sorting');
+    await setAllureTags('Low', 'Low');
     const inventory = poManager.getInventoryPage();
     await inventory.goto();
     expect(await inventory.isPageTitleVisible()).toBe(true);
