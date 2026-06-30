@@ -53,6 +53,10 @@ export class CheckoutStepOnePage extends BasePage {
     return this.actions.isEditable(this.SEL.lastNameInput, 'last name field');
   }
 
+  async getLastNameValue(): Promise<string> {
+    return this.actions.getInputValue(this.SEL.lastNameInput, 'last name field');
+  }
+
   async isFirstNameVisible(): Promise<boolean> {
     return this.actions.isVisible(this.SEL.firstNameInput, 'first name field');
   }

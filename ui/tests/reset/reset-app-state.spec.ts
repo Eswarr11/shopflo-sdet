@@ -1,5 +1,6 @@
 import * as allure from 'allure-js-commons';
 import { setAllureTags } from '../../../helpers/allure-tags.helper';
+import { markKnownDefect } from '../../../helpers/known-defects.helper';
 import { test, expect } from '../../../fixtures/ui.fixture';
 import { buildCheckoutInfo } from '../../../helpers/data.helper';
 import { AUTH_FILES, PRODUCTS } from '../../../config/constants';
@@ -11,12 +12,13 @@ import {
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
-test.describe('Reset App State', { tag: '@regression' }, () => {
+test.describe('Reset App State', { tag: ['@regression', '@known-defect'] }, () => {
   test.beforeEach(async () => {
     await allure.feature('Reset');
   });
 
   test('Verify Reset App State From Inventory Page', async ({ poManager }) => {
+    await markKnownDefect('SAUCEDEMO_RESET_INVENTORY');
     await setAllureTags('Medium', 'High');
     const products = [PRODUCTS.BACKPACK.name, PRODUCTS.BIKE_LIGHT.name];
 
@@ -44,6 +46,7 @@ test.describe('Reset App State', { tag: '@regression' }, () => {
   });
 
   test('Verify Reset App State From Cart Page', async ({ poManager }) => {
+    await markKnownDefect('SAUCEDEMO_RESET_CART');
     await setAllureTags('Medium', 'High');
     const products = [PRODUCTS.BACKPACK.name, PRODUCTS.BOLT_TSHIRT.name];
 
@@ -94,6 +97,7 @@ test.describe('Reset App State', { tag: '@regression' }, () => {
   });
 
   test('Verify Reset App State During Order Overview Step', async ({ page, poManager }) => {
+    await markKnownDefect('SAUCEDEMO_RESET_OVERVIEW');
     await setAllureTags('Medium', 'High');
     await allure.step('Add products and proceed to order overview', async () => {
       await addProductsToCart(poManager, [PRODUCTS.BACKPACK.name]);

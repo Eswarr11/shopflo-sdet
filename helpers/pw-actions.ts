@@ -123,6 +123,12 @@ export class PwActions {
     return value;
   }
 
+  async getInputValue(selector: string | Locator, description = 'field'): Promise<string> {
+    const value = await this.getLocator(selector).inputValue();
+    logger.info(`Input value from "${description}": "${value}"`);
+    return value;
+  }
+
   async getAllTexts(selector: string | Locator, description = 'elements'): Promise<string[]> {
     const texts = await this.getLocator(selector).allTextContents();
     logger.info(`Got ${texts.length} text(s) from: ${description}`);

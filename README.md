@@ -105,22 +105,9 @@ await this.actions.click(item.locator('button'), `Add to cart — ${productName}
 
 ### Extension Plan
 
-**Parallelisation:** `fullyParallel: true` with **5 shards × 2 workers** on PR CI. Local sharding: `CURRENT_SHARD=2 TOTAL_SHARDS=5 WORKERS=2 npm run test:regression`.
-
 **Cross-browser:** [`playwright.config.ts`](playwright.config.ts) currently runs UI tests on **Desktop Chrome** only. Firefox and Edge projects (`devices['Desktop Firefox']`, `devices['Desktop Edge']`) are a natural next step but were held off to keep CI runtime manageable — adding them would triple UI browser matrix cost unless scoped to a nightly or smoke-only job.
 
-**Reporting:** API and UI runs write to shared `reports/allure-results` and `reports/blob`. Run `npm run report` to produce one combined Allure report (`reports/allure-report`) and one Playwright HTML report (`reports/playwright-report`) covering both suites. Allure steps (`allure.step()`) are used in UI tests for business-readable reporting.
-
-```bash
-# Separate runs, single combined report
-npm run test:api && npm run test:ui && npm run report
-
-# Or run everything and report in one step
-npm run test:all:report
-
-npx allure open reports/allure-report
-npx playwright show-report reports/playwright-report
-```
+**Reporting:** Allure steps (`allure.step()`) are used in UI tests for business-readable reporting. Combined Allure + Playwright HTML output is covered in [CI](#ci) and [Quick Start](#quick-start).
 
 ---
 
@@ -152,9 +139,41 @@ npx playwright show-report reports/playwright-report
 
 ### Extension Plan
 
-**Parallelisation:** FakeStoreAPI mutations are simulated (no real DB writes), so all tests are effectively stateless. PR CI uses 5 shards × 2 workers.
-
 **Reporting:** Contract snapshots are committed JSON files — shape drift shows as a `git diff` in PRs. Allure tracks test history across runs.
+
+---
+
+## Known Defects
+
+**9 tests** assert **expected product behavior** but fail because of **bugs or limitations in the demo applications** (SauceDemo and FakeStoreAPI), not because of automation issues. These are documented in the [SauceDemo test cases spreadsheet](https://docs.google.com/spreadsheets/d/1jK9cAb_C6vVrr4h8FTc8oyGkygmwP6a_Y01s3_4vydQ/edit?usp=sharing) and [FakeStoreAPI test cases spreadsheet](https://docs.google.com/spreadsheets/d/1NbomKcn3HD95l9FbgWy1MYpOcaYueGE7iSy4OHucJWE/edit?usp=sharing) with `Status: Failed`.
+
+Each affected test calls `markKnownDefect()` from [`helpers/known-defects.helper.ts`](helpers/known-defects.helper.ts), which uses Playwright’s `test.fail()` so the suite still passes in CI while continuing to assert the correct expected outcome. Tests are tagged `@known-defect` and labeled in Allure with the defect ID.
+
+**When an application fix lands**, the test will start **passing unexpectedly** (because `test.fail()` expects failure) — remove the `markKnownDefect()` call and the `@known-defect` tag for that test.
+
+### SauceDemo UI (4 tests)
+
+| Defect ID | Test | Expected | Actual (why it fails) |
+| --------- | ---- | -------- | --------------------- |
+| `SAUCEDEMO-001` | `checkout/problem-user-checkout.spec.ts` — Verify Checkout Completion for Problem User | Problem user completes checkout after filling shipping info | Last name field does not retain input; checkout stays on step one |
+| `SAUCEDEMO-002` | `reset/reset-app-state.spec.ts` — Verify Reset App State From Inventory Page | Cart badge clears and **Add to Cart** buttons are restored | Cart badge clears, but **Remove** buttons remain on products |
+| `SAUCEDEMO-003` | `reset/reset-app-state.spec.ts` — Verify Reset App State From Cart Page | Cart badge clears and cart is empty | Cart badge clears, but **items remain** in the cart |
+| `SAUCEDEMO-004` | `reset/reset-app-state.spec.ts` — Verify Reset App State During Order Overview Step | Order overview shows no items and purchase cannot complete | Cart badge clears, but **items still appear** on order overview and purchase can still finish |
+
+### FakeStoreAPI (5 tests)
+
+| Defect ID | Test | Expected | Actual (why it fails) |
+| --------- | ---- | -------- | --------------------- |
+| `FAKESTOREAPI-001` | `security.spec.ts` — GET without / with invalid Bearer token | `401 Unauthorized` | API returns **`200`** — no authentication is enforced |
+| `FAKESTOREAPI-002` | `post-validation.spec.ts` — POST with invalid `productId` | `400` validation error | API returns **`201`** and accepts the payload |
+| `FAKESTOREAPI-003` | `post-validation.spec.ts` — POST with negative quantity | `400` validation error | API returns **`201`** and accepts the payload |
+| `FAKESTOREAPI-004` | `post-validation.spec.ts` — POST without `products` field | `400` validation error | API returns **`201`** and accepts the payload |
+
+Run only known-defect tests:
+
+```bash
+npx playwright test --grep @known-defect
+```
 
 ---
 
