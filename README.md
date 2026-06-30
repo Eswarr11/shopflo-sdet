@@ -152,7 +152,7 @@ test('example', async ({ poManager }) => {
 |---|---|---|---|---|
 | [`ci.yml`](.github/workflows/ci.yml) | Push + PR to `main` / `master` | UI: Playwright Docker, API: Node 24 | 5 | 2 |
 
-CI runs `setup-auth` once, then API and UI each execute as a **5-shard matrix**. Each shard uploads `blob-report` and `my-allure-results` artifacts; a merge job combines them into Playwright HTML + Allure reports (uploaded as build artifacts — no GitHub Pages deploy).
+CI runs `setup-auth` once, then API and UI each execute as a **5-shard matrix**. Merged Playwright HTML + Allure reports are uploaded as build artifacts. On push to `main`/`master`, reports are also deployed to **GitHub Pages**.
 
 ### Runner setup
 
@@ -161,7 +161,13 @@ CI runs `setup-auth` once, then API and UI each execute as a **5-shard matrix**.
 | `setup-auth`, `ui-tests` | `mcr.microsoft.com/playwright:v1.61.1-noble` | Browsers pre-installed — no `playwright install` step |
 | `api-tests`, `merge-*` | `ubuntu-latest` + Node 24 | API tests need no browser; merge jobs only need npm + Java |
 
-Pin `PLAYWRIGHT_IMAGE` in `ci.yml` to match `@playwright/test` in `package.json`.
+Pin `PLAYWRIGHT_IMAGE` in `ci.yml` to match `@playwright/test` in `package.json`. Container jobs set `ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true` because the Playwright image bundles Node 20 while GitHub runners default to Node 24.
+
+### GitHub Pages
+
+On push to `main` or `master`, the `deploy-pages` job publishes merged reports. Enable it once in the repo:
+
+**Settings → Pages → Build and deployment → Source: GitHub Actions**
 
 ### Sharding (local)
 

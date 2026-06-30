@@ -9,11 +9,14 @@ on:
 permissions:
   contents: read
   actions: write
+  pages: write
+  id-token: write
 
 env:
   API_BASE_URL: https://fakestoreapi.com
   UI_BASE_URL: https://www.saucedemo.com
   PLAYWRIGHT_IMAGE: mcr.microsoft.com/playwright:v1.61.1-noble
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
 jobs:
   setup-auth:
@@ -256,3 +259,77 @@ jobs:
             allure-report/
           if-no-files-found: warn
           retention-days: 14
+
+  deploy-pages:
+    name: Deploy reports to GitHub Pages
+    needs: [merge-api-reports, merge-ui-reports]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download API reports
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: api-reports-${{ github.run_number }}
+          path: downloaded/api
+
+      - name: Download UI reports
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: ui-reports-${{ github.run_number }}
+          path: downloaded/ui
+
+      - name: Prepare GitHub Pages
+        run: |
+          mkdir -p gh-pages/api/playwright gh-pages/api/allure gh-pages/ui/playwright gh-pages/ui/allure
+
+          if [ -d downloaded/api/playwright-report ]; then
+            cp -r downloaded/api/playwright-report/. gh-pages/api/playwright/
+          fi
+          if [ -d downloaded/api/allure-report ]; then
+            cp -r downloaded/api/allure-report/. gh-pages/api/allure/
+          fi
+          if [ -d downloaded/ui/playwright-report ]; then
+            cp -r downloaded/ui/playwright-report/. gh-pages/ui/playwright/
+          fi
+          if [ -d downloaded/ui/allure-report ]; then
+            cp -r downloaded/ui/allure-report/. gh-pages/ui/allure/
+          fi
+
+          cat > gh-pages/index.html << EOF
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>SDET Test Reports</title>
+            <style>
+              body { font-family: sans-serif; padding: 40px; max-width: 600px; margin: 0 auto; }
+              h1 { margin-bottom: 8px; }
+              h2 { margin-top: 32px; color: #333; }
+              a { display: block; margin: 8px 0; font-size: 16px; }
+            </style>
+          </head>
+          <body>
+            <h1>SDET Test Reports</h1>
+            <p>Run #${GITHUB_RUN_NUMBER} &mdash; ${GITHUB_SHA}</p>
+            <h2>API (FakeStoreAPI)</h2>
+            <a href="api/playwright/">Playwright HTML Report</a>
+            <a href="api/allure/">Allure Report</a>
+            <h2>UI (SauceDemo)</h2>
+            <a href="ui/playwright/">Playwright HTML Report</a>
+            <a href="ui/allure/">Allure Report</a>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: gh-pages
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
