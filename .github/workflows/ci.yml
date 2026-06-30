@@ -36,6 +36,7 @@ jobs:
 
   setup-auth:
     name: Generate auth sessions
+    needs: quality-gates
     runs-on: ubuntu-latest
     timeout-minutes: 30
     container:
@@ -120,7 +121,7 @@ jobs:
 
   merge-reports:
     name: Merge API and UI reports
-    needs: [api-tests, ui-tests]
+    needs: [api-tests, ui-tests, quality-gates]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
