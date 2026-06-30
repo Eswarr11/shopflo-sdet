@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import * as dotenv from 'dotenv';
+import * as path from 'path';
+
 dotenv.config();
 
 const isCi = !!process.env.CI;
@@ -41,8 +43,8 @@ export default defineConfig({
   shard: !isCi && currentShard && totalShards
     ? { current: currentShard, total: totalShards }
     : undefined,
-  globalSetup: './global-setup',
-  globalTeardown: './global-teardown',
+  globalSetup: path.resolve(__dirname, 'global-setup'),
+  globalTeardown: path.resolve(__dirname, 'global-teardown'),
   reporter: reporters,
   use: {
     actionTimeout: 20_000,
@@ -64,7 +66,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         baseURL: process.env.UI_BASE_URL || 'https://www.saucedemo.com',
-        headless: process.env.HEADED !== 'true',
+        headless: false, // process.env.HEADED !== 'true',
       },
     },
   ],

@@ -1,13 +1,18 @@
-import { chromium, FullConfig, Browser } from '@playwright/test';
+import { chromium, FullConfig, Browser, Page } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 import { USERS, PASSWORD } from './config/constants';
-import { LoginPage } from './ui/pages/login.page';
 
 const AUTH_DIR = path.join(process.cwd(), '.auth');
 const FRESHNESS_MS = 24 * 60 * 60 * 1000;
 const SETUP_TIMEOUT_MS = 60_000;
 const PERFORMANCE_GLITCH_TIMEOUT_MS = 90_000;
+
+const LOGIN_SEL = {
+  username:    '[data-test="username"]',
+  password:    '[data-test="password"]',
+  loginButton: '[data-test="login-button"]',
+};
 
 const AUTH_USERS = [
   USERS.STANDARD,
@@ -16,6 +21,29 @@ const AUTH_USERS = [
   USERS.ERROR,
   USERS.VISUAL,
 ] as const;
+
+function resolveBaseURL(config: FullConfig): string {
+  const fromEnv = process.env.UI_BASE_URL;
+  if (fromEnv) return fromEnv.replace(/\/$/, '');
+
+  const fromProject = config.projects
+    ?.find((project) => project.name === 'ui')
+    ?.use?.baseURL;
+
+  if (typeof fromProject === 'string' && fromProject.length > 0) {
+    return fromProject.replace(/\/$/, '');
+  }
+
+  return 'https://www.saucedemo.com';
+}
+
+function inventoryUrl(baseURL: string): string {
+  return `${baseURL}/inventory.html`;
+}
+
+function loginUrl(baseURL: string): string {
+  return `${baseURL}/`;
+}
 
 function isAuthFileValid(authFile: string): boolean {
   if (!fs.existsSync(authFile)) return false;
@@ -29,18 +57,25 @@ function isAuthFileValid(authFile: string): boolean {
   }
 }
 
+async function waitForLoginForm(page: Page, baseURL: string, timeout: number): Promise<void> {
+  await page.goto(loginUrl(baseURL), { waitUntil: 'domcontentloaded', timeout });
+  await page.locator(LOGIN_SEL.username).waitFor({ state: 'visible', timeout });
+  await page.locator(LOGIN_SEL.password).waitFor({ state: 'visible', timeout });
+  await page.locator(LOGIN_SEL.loginButton).waitFor({ state: 'visible', timeout });
+}
+
 async function verifyAuthFile(
   browser: Browser,
   baseURL: string,
   authFile: string,
 ): Promise<boolean> {
-  const context = await browser.newContext({ baseURL });
+  const context = await browser.newContext({ storageState: authFile });
   const page = await context.newPage();
   page.setDefaultTimeout(SETUP_TIMEOUT_MS);
   page.setDefaultNavigationTimeout(SETUP_TIMEOUT_MS);
 
   try {
-    await page.goto('/inventory.html', { waitUntil: 'domcontentloaded' });
+    await page.goto(inventoryUrl(baseURL), { waitUntil: 'domcontentloaded' });
     await page.waitForURL(/inventory\.html/, { timeout: 15_000 });
     return true;
   } catch {
@@ -56,20 +91,21 @@ async function loginAndSaveState(
   username: string,
   authFile: string,
 ): Promise<void> {
-  const inventoryTimeout = username === USERS.PERFORMANCE_GLITCH
+  const timeout = username === USERS.PERFORMANCE_GLITCH
     ? PERFORMANCE_GLITCH_TIMEOUT_MS
     : SETUP_TIMEOUT_MS;
 
-  const context = await browser.newContext({ baseURL });
+  const context = await browser.newContext();
   const page = await context.newPage();
-  page.setDefaultTimeout(inventoryTimeout);
-  page.setDefaultNavigationTimeout(inventoryTimeout);
+  page.setDefaultTimeout(timeout);
+  page.setDefaultNavigationTimeout(timeout);
 
   try {
-    const loginPage = new LoginPage(page);
-    await loginPage.goto();
-    await loginPage.login(username, PASSWORD);
-    await page.waitForURL(/inventory\.html/, { timeout: inventoryTimeout });
+    await waitForLoginForm(page, baseURL, timeout);
+    await page.locator(LOGIN_SEL.username).fill(username);
+    await page.locator(LOGIN_SEL.password).fill(PASSWORD);
+    await page.locator(LOGIN_SEL.loginButton).click();
+    await page.waitForURL(/inventory\.html/, { timeout });
 
     await context.storageState({ path: authFile });
     console.log(`[Setup] Auth saved for ${username}`);
@@ -114,9 +150,8 @@ async function globalSetup(config: FullConfig): Promise<void> {
     fs.mkdirSync(AUTH_DIR, { recursive: true });
   }
 
-  const baseURL = config.projects
-    .find((p) => p.name === 'ui')
-    ?.use?.baseURL ?? 'https://www.saucedemo.com';
+  const baseURL = resolveBaseURL(config);
+  console.log(`[Setup] Using base URL: ${baseURL}`);
 
   const browser = await chromium.launch({ headless: true });
 
