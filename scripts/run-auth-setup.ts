@@ -8,4 +8,12 @@ const config = {
   }],
 } as FullConfig;
 
-void globalSetup(config);
+async function main(): Promise<void> {
+  await globalSetup(config);
+  console.log('[Setup] Auth setup complete');
+}
+
+main().catch((error: unknown) => {
+  console.error('[Setup] Auth setup failed:', error);
+  process.exit(1);
+});

@@ -46,6 +46,7 @@ jobs:
         with:
           name: auth-state
           path: .auth
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 1
 
