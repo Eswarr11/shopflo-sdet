@@ -32,7 +32,6 @@ jobs:
         run: npx ts-node scripts/run-auth-setup.ts
         env:
           CI: true
-          UI_BASE_URL: ${{ env.UI_BASE_URL }}
 
       - name: Verify auth files
         run: |
@@ -59,7 +58,6 @@ jobs:
     env:
       CI: true
       WORKERS: '2'
-      API_BASE_URL: ${{ env.API_BASE_URL }}
     steps:
       - uses: actions/checkout@v4
 
@@ -164,7 +162,6 @@ jobs:
     env:
       CI: true
       WORKERS: '2'
-      UI_BASE_URL: ${{ env.UI_BASE_URL }}
     steps:
       - uses: actions/checkout@v4
 
