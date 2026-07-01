@@ -2,21 +2,26 @@ import { Locator, Page } from '@playwright/test';
 import { BasePage } from './base.page';
 
 export class CartPage extends BasePage {
-  private readonly SEL = {
-    cartItems: '.cart_item',
-    cartItemNames: 'getByTestId("inventory-item-name")',
-    continueShoppingButton: 'getByTestId("continue-shopping")',
-    checkoutButton: 'getByTestId("checkout")',
-    pageTitle: 'getByTestId("title")',
-    removeButton: '[data-test^="remove"]',
-  };
+  private readonly cartItems: Locator;
+  private readonly cartItemNames: Locator;
+  private readonly continueShoppingButton: Locator;
+  private readonly checkoutButton: Locator;
+  private readonly pageTitle: Locator;
+  private readonly removeButton: Locator;
+  private readonly removeButtonSelector = '[data-test^="remove"]';
 
   constructor(page: Page) {
     super(page);
+    this.cartItems = this.byCss('.cart_item');
+    this.cartItemNames = this.byTestId('inventory-item-name');
+    this.continueShoppingButton = this.byTestId('continue-shopping');
+    this.checkoutButton = this.byTestId('checkout');
+    this.pageTitle = this.byTestId('title');
+    this.removeButton = this.byCss(this.removeButtonSelector);
   }
 
   private getCartItemByName(productName: string): Locator {
-    return this.page.locator(this.SEL.cartItems, { hasText: productName });
+    return this.cartItems.filter({ hasText: productName });
   }
 
   async goto(): Promise<void> {
@@ -24,31 +29,31 @@ export class CartPage extends BasePage {
   }
 
   async getCartItemNames(): Promise<string[]> {
-    return this.actions.getAllTexts(this.SEL.cartItemNames, 'cart item names');
+    return this.actions.getAllTexts(this.cartItemNames, 'cart item names');
   }
 
   async getCartItemCount(): Promise<number> {
-    return this.actions.getCount(this.SEL.cartItems, 'cart items');
+    return this.actions.getCount(this.cartItems, 'cart items');
   }
 
   async removeItem(productName: string): Promise<void> {
     const item = this.getCartItemByName(productName);
-    await this.actions.click(item.locator(this.SEL.removeButton), `remove — ${productName}`);
+    await this.actions.click(item.locator(this.removeButtonSelector), `remove — ${productName}`);
   }
 
   async continueShopping(): Promise<void> {
-    await this.actions.click(this.SEL.continueShoppingButton, 'continue shopping button');
+    await this.actions.click(this.continueShoppingButton, 'continue shopping button');
   }
 
   async expectTitleVisible(): Promise<void> {
-    await this.actions.expectVisible(this.SEL.pageTitle, 'cart page title');
+    await this.actions.expectVisible(this.pageTitle, 'cart page title');
   }
 
   async expectCheckoutButtonVisible(): Promise<void> {
-    await this.actions.expectVisible(this.SEL.checkoutButton, 'checkout button');
+    await this.actions.expectVisible(this.checkoutButton, 'checkout button');
   }
 
   async proceedToCheckout(): Promise<void> {
-    await this.actions.click(this.SEL.checkoutButton, 'checkout button');
+    await this.actions.click(this.checkoutButton, 'checkout button');
   }
 }

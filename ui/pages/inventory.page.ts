@@ -6,25 +6,28 @@ import { CommonUtils } from '@helpers/common-utils';
 export class InventoryPage extends BasePage {
   private readonly header: HeaderComponent;
 
-  private readonly SEL = {
-    sortDropdown: 'getByTestId("product-sort-container")',
-    productItems: '.inventory_item',
-    productNames: 'getByTestId("inventory-item-name")',
-    productPrices: 'getByTestId("inventory-item-price")',
-    pageTitle: 'getByTestId("title")',
-    itemActionButton: 'button',
-    addToCartButton: '[data-test^="add-to-cart"]',
-    removeButton: '[data-test^="remove"]',
-    productImage: 'img',
-  };
+  private readonly sortDropdown: Locator;
+  private readonly productItems: Locator;
+  private readonly productNames: Locator;
+  private readonly productPrices: Locator;
+  private readonly pageTitle: Locator;
+  private readonly itemActionButtonSelector = 'button';
+  private readonly addToCartButtonSelector = '[data-test^="add-to-cart"]';
+  private readonly removeButtonSelector = '[data-test^="remove"]';
+  private readonly productImageSelector = 'img';
 
   constructor(page: Page) {
     super(page);
     this.header = new HeaderComponent(page);
+    this.sortDropdown = this.byTestId('product-sort-container');
+    this.productItems = this.byCss('.inventory_item');
+    this.productNames = this.byTestId('inventory-item-name');
+    this.productPrices = this.byTestId('inventory-item-price');
+    this.pageTitle = this.byTestId('title');
   }
 
   private getProductItemByName(productName: string): Locator {
-    return this.page.locator(this.SEL.productItems, { hasText: productName });
+    return this.productItems.filter({ hasText: productName });
   }
 
   async goto(): Promise<void> {
@@ -32,13 +35,13 @@ export class InventoryPage extends BasePage {
   }
 
   async sortBy(option: string): Promise<void> {
-    await this.actions.selectOption(this.SEL.sortDropdown, option, 'sort dropdown');
+    await this.actions.selectOption(this.sortDropdown, option, 'sort dropdown');
   }
 
   async addToCartByName(productName: string): Promise<void> {
     const item = this.getProductItemByName(productName);
     await this.actions.click(
-      item.locator(this.SEL.itemActionButton),
+      item.locator(this.itemActionButtonSelector),
       `Add to cart — ${productName}`,
     );
   }
@@ -46,24 +49,24 @@ export class InventoryPage extends BasePage {
   async removeFromCartByName(productName: string): Promise<void> {
     const item = this.getProductItemByName(productName);
     await this.actions.click(
-      item.locator(this.SEL.itemActionButton),
+      item.locator(this.itemActionButtonSelector),
       `Remove from cart — ${productName}`,
     );
   }
 
   async getProductNames(): Promise<string[]> {
-    return this.actions.getAllTexts(this.SEL.productNames, 'product names');
+    return this.actions.getAllTexts(this.productNames, 'product names');
   }
 
   async getProductPrices(): Promise<number[]> {
-    const texts = await this.actions.getAllTexts(this.SEL.productPrices, 'product prices');
+    const texts = await this.actions.getAllTexts(this.productPrices, 'product prices');
     return texts.map((t) => CommonUtils.normalizePrice(t));
   }
 
   async getProductPriceByName(productName: string): Promise<number> {
     const item = this.getProductItemByName(productName);
     const text = await this.actions.getText(
-      item.locator(this.toScopedSelector(this.SEL.productPrices)),
+      item.getByTestId('inventory-item-price'),
       `price — ${productName}`,
     );
     return CommonUtils.normalizePrice(text ?? '');
@@ -84,21 +87,16 @@ export class InventoryPage extends BasePage {
   async getMismatchedProductImageCount(
     expectedSlugByName: Record<string, string>,
   ): Promise<number> {
-    const items = this.page.locator(this.SEL.productItems);
-    const count = await items.count();
+    const count = await this.productItems.count();
     let mismatches = 0;
 
     for (let i = 0; i < count; i++) {
-      const item = items.nth(i);
+      const item = this.productItems.nth(i);
       const name =
-        (
-          await this.actions.getText(
-            item.locator(this.toScopedSelector(this.SEL.productNames)),
-            `product name ${i}`,
-          )
-        )?.trim() ?? '';
+        (await this.actions.getText(item.getByTestId('inventory-item-name'), `product name ${i}`))
+          ?.trim() ?? '';
       const src = await this.actions.getAttributeValue(
-        item.locator(this.SEL.productImage),
+        item.locator(this.productImageSelector),
         'src',
         `product image for ${name}`,
       );
@@ -112,23 +110,21 @@ export class InventoryPage extends BasePage {
   }
 
   async clickProduct(productName: string): Promise<void> {
-    const link = this.page.locator(this.toScopedSelector(this.SEL.productNames), {
-      hasText: productName,
-    });
+    const link = this.productNames.filter({ hasText: productName });
     await this.actions.click(link, `product link — ${productName}`);
   }
 
   async getProductCount(): Promise<number> {
-    return this.actions.getCount(this.SEL.productItems, 'inventory items');
+    return this.actions.getCount(this.productItems, 'inventory items');
   }
 
   async expectPageTitleVisible(): Promise<void> {
-    await this.actions.expectVisible(this.SEL.pageTitle, 'inventory page title');
+    await this.actions.expectVisible(this.pageTitle, 'inventory page title');
   }
 
   async waitForLoad(): Promise<void> {
     await this.page.waitForLoadState('domcontentloaded');
-    await this.actions.waitForVisible(this.SEL.pageTitle, 'inventory page title');
+    await this.actions.waitForVisible(this.pageTitle, 'inventory page title');
   }
 
   async goToCart(): Promise<void> {
@@ -138,7 +134,7 @@ export class InventoryPage extends BasePage {
   async expectAddToCartShownForProduct(productName: string): Promise<void> {
     const item = this.getProductItemByName(productName);
     await this.actions.expectVisible(
-      item.locator(this.SEL.addToCartButton),
+      item.locator(this.addToCartButtonSelector),
       `add to cart — ${productName}`,
     );
   }
@@ -146,7 +142,7 @@ export class InventoryPage extends BasePage {
   async expectRemoveShownForProduct(productName: string): Promise<void> {
     const item = this.getProductItemByName(productName);
     await this.actions.expectVisible(
-      item.locator(this.SEL.removeButton),
+      item.locator(this.removeButtonSelector),
       `remove — ${productName}`,
     );
   }
@@ -154,7 +150,7 @@ export class InventoryPage extends BasePage {
   async expectRemoveHiddenForProduct(productName: string): Promise<void> {
     const item = this.getProductItemByName(productName);
     await this.actions.expectHidden(
-      item.locator(this.SEL.removeButton),
+      item.locator(this.removeButtonSelector),
       `remove — ${productName}`,
     );
   }

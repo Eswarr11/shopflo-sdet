@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import { PwActions } from '@helpers/pw-actions';
 
 export class BasePage {
@@ -18,8 +18,15 @@ export class BasePage {
     await this.page.waitForLoadState('domcontentloaded');
   }
 
-  protected toScopedSelector(selector: string): string {
-    const match = selector.match(/^getByTestId\(['"](.+)['"]\)$/);
-    return match ? `[data-test="${match[1]}"]` : selector;
+  protected byTestId(testId: string): Locator {
+    return this.page.getByTestId(testId);
+  }
+
+  protected byCss(selector: string): Locator {
+    return this.page.locator(selector);
+  }
+
+  protected byXPath(xpath: string): Locator {
+    return this.page.locator(`xpath=${xpath}`);
   }
 }
