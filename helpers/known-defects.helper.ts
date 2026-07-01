@@ -34,16 +34,25 @@ export const KNOWN_DEFECTS = {
     id: 'FAKESTOREAPI-004',
     summary: 'POST /carts accepts payload without products field',
   },
+  FAKESTOREAPI_IDOR_READ: {
+    id: 'FAKESTOREAPI-005',
+    summary: 'Unauthenticated clients can read any cart by id (IDOR)',
+  },
+  FAKESTOREAPI_IDOR_CROSS_USER: {
+    id: 'FAKESTOREAPI-006',
+    summary: 'Authenticated clients can read carts belonging to other users',
+  },
+  FAKESTOREAPI_IDOR_WRITE: {
+    id: 'FAKESTOREAPI-007',
+    summary: 'Unauthenticated clients can mutate another users cart',
+  },
+  FAKESTOREAPI_WRITE_NO_AUTH: {
+    id: 'FAKESTOREAPI-008',
+    summary: 'POST and DELETE /carts do not require authorization',
+  },
 } as const;
 
 type KnownDefectKey = keyof typeof KNOWN_DEFECTS;
-
-export async function annotateKnownDefect(key: KnownDefectKey): Promise<void> {
-  const defect = KNOWN_DEFECTS[key];
-  await allure.label('known-defect', defect.id);
-  await allure.tag('known-defect');
-  await allure.description(`Known application defect [${defect.id}]: ${defect.summary}`);
-}
 
 export async function markKnownDefect(key: KnownDefectKey): Promise<void> {
   const defect = KNOWN_DEFECTS[key];

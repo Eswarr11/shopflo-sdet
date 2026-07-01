@@ -17,7 +17,7 @@ npm run test:all:report   # Run full suite and generate combined reports
 npm run quality           # Typecheck + lint + format check (CI gate)
 ```
 
-**77 automated tests** total: **47 UI** + **30 API** across 23 spec files.
+**85 automated tests** total: **47 UI** + **38 API** across 23 spec files.
 
 Auth sessions for UI tests are generated automatically by `global-setup.ts` before the suite runs. Re-run tests anytime — auth files in `.auth/` are refreshed when older than 24 hours.
 
@@ -63,7 +63,7 @@ npm run quality       # All three (used in CI)
 - `checkout/validation.spec.ts` — one `test.describe` (`Verify Mandatory Customer Information Validation`) runs as **4 separate tests** (missing first name, last name, postal code, all fields empty).
 - `checkout/e2e.spec.ts` — `Verify Successful End-to-End Checkout for Standard User` clubs the full checkout flow with order-summary price checks (subtotal, per-item prices, total = subtotal + tax). The same pricing rules are also covered in isolation by `checkout/summary.spec.ts`.
 - `@smoke` — critical subset: login, add-to-cart, product detail, cart items, E2E checkout, API cart POST.
-- `@regression` — full suite: all **47** UI and **30** API tests (**77 total**; tagged at `test.describe` level; smoke tests inherit both tags).
+- `@regression` — full suite: all **47** UI and **38** API tests (**85 total**; tagged at `test.describe` level; smoke tests inherit both tags).
 
 ### Framework: Playwright v1.61 + TypeScript
 
@@ -115,17 +115,17 @@ await this.actions.click(item.locator('button'), `Add to cart — ${productName}
 
 ### Test Coverage
 
-**30 automated API tests** across 6 spec files:
+**38 automated API tests** across 6 spec files:
 
 | Spec file                  |  Tests | Coverage                                                     |
 | -------------------------- | -----: | ------------------------------------------------------------ |
 | `cart-crud.spec.ts`        |     14 | CRUD, simulated negatives, auth, schema field checks         |
-| `get.spec.ts`              |      4 | GET list, by id, products array, non-existent id             |
+| `security.spec.ts`         |     10 | Auth boundary, IDOR, unauthenticated write operations        |
 | `cart-data-driven.spec.ts` |      5 | POST cart over 5 product IDs                                 |
-| `cart-contract.spec.ts`    |      2 | Single-cart snapshot + collection contract                   |
+| `get.spec.ts`              |      4 | GET list, by id, products array, non-existent id             |
 | `post-validation.spec.ts`  |      3 | Invalid productId, negative quantity, missing products field |
-| `security.spec.ts`         |      2 | Missing / invalid Bearer token                               |
-| **Total**                  | **30** |                                                              |
+| `cart-contract.spec.ts`    |      2 | Single-cart snapshot + collection contract                   |
+| **Total**                  | **38** |                                                              |
 
 `cart-data-driven.spec.ts` defines one `test()` inside a loop over 5 product IDs — Playwright lists **5 runtime tests** from that single spec file.
 
@@ -145,7 +145,9 @@ await this.actions.click(item.locator('button'), `Add to cart — ${productName}
 
 ## Known Defects
 
-**9 tests** assert **expected product behavior** from the manual test case spreadsheets, but the **demo applications do not meet that expected behavior**. These are **not automation bugs** — the tests correctly detect real defects in SauceDemo and FakeStoreAPI.
+**17 of 85 tests** assert **expected product behavior** from the manual test case spreadsheets, but the **demo applications do not meet that expected behavior**. These are **not automation bugs** — the tests correctly detect real defects in SauceDemo and FakeStoreAPI. The remaining **68 tests** are genuine passes against current app/API behavior.
+
+All 17 use the same `markKnownDefect()` pattern (see below). Breakdown: **4 UI** + **13 API**.
 
 Source of truth (manual execution `Status: Failed`):
 
@@ -154,20 +156,43 @@ Source of truth (manual execution `Status: Failed`):
 
 ### Why they show as **Passed** in CI and reports
 
-Each affected test calls `markKnownDefect()` from [`helpers/known-defects.helper.ts`](helpers/known-defects.helper.ts), which invokes Playwright’s [`test.fail()`](https://playwright.dev/docs/test-annotations#test-fail):
+All **17 known-defect tests** use the same single pattern — no mixed approaches. Each test:
+
+1. **Asserts the correct expected behavior** from the manual test case (e.g. `401 Unauthorized`, checkout reaches step two).
+2. **Calls `markKnownDefect()`** at the start, which registers the defect in Allure and tells Playwright the failure is expected.
+
+Implementation in [`helpers/known-defects.helper.ts`](helpers/known-defects.helper.ts):
 
 ```typescript
-test.fail(true, `[${defect.id}] ${defect.summary}`);
+export async function markKnownDefect(key: KnownDefectKey): Promise<void> {
+  const defect = KNOWN_DEFECTS[key];
+  test.fail(true, `[${defect.id}] ${defect.summary}`); // Playwright: expect this test to fail
+  await allure.label('known-defect', defect.id);
+  await allure.tag('known-defect');
+}
 ```
 
-| What happens               | Detail                                                                                                                                                                     |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Assertion outcome**      | The test **does fail logically** — the assertion does not match actual app/API behavior (see tables below).                                                                |
-| **Playwright / CI result** | Because failure was **expected**, Playwright marks the test **Passed** so the **CI pipeline does not fail** on known third-party demo bugs.                                |
-| **Allure result**          | Allure-playwright maps an expected failure to **Passed** for the same reason.                                                                                              |
-| **How to find them**       | Filter by tag `@known-defect` or Allure label `known-defect` (e.g. `SAUCEDEMO-001`). Step-level failure details are still visible inside the test body in Allure / traces. |
+Playwright's [`test.fail()`](https://playwright.dev/docs/test-annotations#test-fail) inverts the usual pass/fail logic: if the test **does** fail, the run result is **Passed**; if it **passes**, the run result is **Failed**.
 
-This is intentional: automation keeps asserting the **correct expected outcome** (so defects stay documented and will be caught if the app is fixed), while CI stays green for defects outside our control.
+```
+Manual test case says:     "API should return 401 without auth"
+Demo app actually does:    Returns 200 with data
+Automation asserts:        expect 401  →  assertion FAILS (correct — bug detected)
+test.fail(true):           "I expected this failure"  →  Playwright result: PASSED
+CI pipeline:               Green ✓  (no false alarm on a third-party demo bug)
+```
+
+| Layer               | What you see                 | What it means                                                                                                                                                                                         |
+| ------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Assertion**       | Fails                        | Automation correctly detected that the app/API does not meet the expected behavior. The defect is real and documented.                                                                                |
+| **Playwright / CI** | Passed                       | Failure was pre-declared via `test.fail()` — CI stays green because this is a known, accepted demo-app limitation, not a regression in our code.                                                      |
+| **Allure**          | Passed + `@known-defect` tag | Same mapping as Playwright. Filter by `@known-defect` or label `known-defect` (e.g. `SAUCEDEMO-001`) to list all documented bugs. Assertion details remain visible in steps, traces, and screenshots. |
+
+**Why not skip or assert the broken behavior instead?**
+
+- **Skip / `test.fixme()`** — defect never runs; easy to forget; no daily signal that the bug still exists.
+- **Assert broken behavior** (e.g. expect `200` when spec says `401`) — test passes but stops documenting the gap; if the app is fixed, the test breaks for the wrong reason.
+- **`markKnownDefect()` + correct assertion** — runs every CI build, keeps asserting the right outcome, stays green until the app is fixed, then **flips to Failed** automatically.
 
 **When an application fix lands**, the assertion will start passing while `test.fail()` still expects failure — the test will flip to **Failed** in CI. That is the signal to remove `markKnownDefect()` and the `@known-defect` tag for that test.
 
@@ -180,12 +205,20 @@ This is intentional: automation keeps asserting the **correct expected outcome**
 | `SAUCEDEMO-003` | `reset/reset-app-state.spec.ts` — From Cart      | Reset empties the cart                 | Cart badge clears, but line items remain                               | `getCartItemCount()` returns `2` (expected `0`) after reset                                                   |
 | `SAUCEDEMO-004` | `reset/reset-app-state.spec.ts` — Order Overview | Reset clears order overview            | Badge clears, but items still listed and purchase can finish           | `getItemCount()` returns `1` (expected `0`) on checkout step two after reset                                  |
 
-### FakeStoreAPI (5 tests)
+### FakeStoreAPI (13 tests)
 
 | Defect ID          | Test                                                   | Expected               | Actual API behavior                                         | Failing assertion (evidence)                                                |
 | ------------------ | ------------------------------------------------------ | ---------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------- |
 | `FAKESTOREAPI-001` | `security.spec.ts` — no token                          | `401 Unauthorized`     | `GET /carts` returns **`200`** with data — no auth enforced | `assertApiErrorStatus(..., 401)` — request succeeds instead of throwing 401 |
-| `FAKESTOREAPI-001` | `security.spec.ts` — invalid token                     | `401 Unauthorized`     | Same — invalid Bearer token still returns **`200`**         | `assertApiErrorStatus(..., 401)` — request succeeds instead of throwing 401 |
+| `FAKESTOREAPI-001` | `security.spec.ts` — malformed token                   | `401 Unauthorized`     | Same — malformed Bearer token still returns **`200`**       | `assertApiErrorStatus(..., 401)` — request succeeds instead of throwing 401 |
+| `FAKESTOREAPI-001` | `security.spec.ts` — tampered JWT                      | `401 Unauthorized`     | Same — tampered JWT still returns **`200`**                 | `assertApiErrorStatus(..., 401)` — request succeeds instead of throwing 401 |
+| `FAKESTOREAPI-001` | `security.spec.ts` — empty Bearer token                | `401 Unauthorized`     | Same — empty Bearer token still returns **`200`**           | `assertApiErrorStatus(..., 401)` — request succeeds instead of throwing 401 |
+| `FAKESTOREAPI-001` | `security.spec.ts` — invalid token PUT                 | `401 Unauthorized`     | `PUT /carts/:id` succeeds with invalid Bearer token         | `assertApiErrorStatus(..., 401)` — request succeeds instead of throwing 401 |
+| `FAKESTOREAPI-005` | `security.spec.ts` — unauthenticated GET by id         | `401 Unauthorized`     | Unauthenticated client can read any cart by id              | `assertApiErrorStatus(..., 401)` — request succeeds instead of throwing 401 |
+| `FAKESTOREAPI-006` | `security.spec.ts` — cross-user read                   | `403 Forbidden`        | Authenticated client can read another users cart            | `assertApiErrorStatus(..., 403)` — request succeeds instead of throwing 403 |
+| `FAKESTOREAPI-007` | `security.spec.ts` — unauthenticated PATCH             | `401 Unauthorized`     | Unauthenticated PATCH can modify another users cart         | `assertApiErrorStatus(..., 401)` — request succeeds instead of throwing 401 |
+| `FAKESTOREAPI-008` | `security.spec.ts` — unauthenticated POST              | `401 Unauthorized`     | Unauthenticated POST creates a cart                         | `assertApiErrorStatus(..., 401)` — request succeeds instead of throwing 401 |
+| `FAKESTOREAPI-008` | `security.spec.ts` — unauthenticated DELETE            | `401 Unauthorized`     | Unauthenticated DELETE returns success                      | `assertApiErrorStatus(..., 401)` — request succeeds instead of throwing 401 |
 | `FAKESTOREAPI-002` | `post-validation.spec.ts` — invalid `productId: 99999` | `400` validation error | API returns **`201 Created`**                               | `assertApiErrorStatus(..., 400)` — create succeeds for non-existent product |
 | `FAKESTOREAPI-003` | `post-validation.spec.ts` — negative quantity          | `400` validation error | API returns **`201 Created`**                               | `assertApiErrorStatus(..., 400)` — create succeeds with `quantity: -1`      |
 | `FAKESTOREAPI-004` | `post-validation.spec.ts` — missing `products`         | `400` validation error | API returns **`201 Created`**                               | `assertApiErrorStatus(..., 400)` — create succeeds without `products` field |

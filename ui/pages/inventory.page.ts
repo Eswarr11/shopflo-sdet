@@ -93,8 +93,9 @@ export class InventoryPage extends BasePage {
     for (let i = 0; i < count; i++) {
       const item = this.productItems.nth(i);
       const name =
-        (await this.actions.getText(item.getByTestId('inventory-item-name'), `product name ${i}`))
-          ?.trim() ?? '';
+        (
+          await this.actions.getText(item.getByTestId('inventory-item-name'), `product name ${i}`)
+        )?.trim() ?? '';
       const src = await this.actions.getAttributeValue(
         item.locator(this.productImageSelector),
         'src',

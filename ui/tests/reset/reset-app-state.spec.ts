@@ -4,11 +4,7 @@ import { markKnownDefect } from '@helpers/known-defects.helper';
 import { test, expect } from '@fixtures/ui.fixture';
 import { buildCheckoutInfo } from '@helpers/data.helper';
 import { AUTH_FILES, PRODUCTS } from '@config/constants';
-import {
-  addProductsToCart,
-  navigateToCart,
-  openBurgerMenuAndReset,
-} from '@ui/helpers/flow.helper';
+import { addProductsToCart, navigateToCart, openBurgerMenuAndReset } from '@ui/helpers/flow.helper';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
