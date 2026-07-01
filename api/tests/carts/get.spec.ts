@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { CartsService } from '../../services/carts.service';
 import { CartListSchema, CartSchema } from '../../schemas/cart.schema';
-import { assertNullOrApiError, assertSchema } from '../../../helpers/api.assertions';
+import { assertNullOrApiError, assertSchema } from '@helpers/api.assertions';
 
 const carts = new CartsService();
 

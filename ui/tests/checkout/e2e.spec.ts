@@ -1,10 +1,10 @@
 import * as allure from 'allure-js-commons';
-import { setAllureTags } from '../../../helpers/allure-tags.helper';
-import { test, expect } from '../../../fixtures/ui.fixture';
-import { buildCheckoutInfo, pickRandomProductNames } from '../../../helpers/data.helper';
-import { AUTH_FILES, PRODUCTS } from '../../../config/constants';
-import { MESSAGES } from '../../../config/messages';
-import { addProductFromDetailPage, navigateToCheckoutStepTwo } from '../../helpers/flow.helper';
+import { setAllureTags } from '@helpers/allure-tags.helper';
+import { test, expect } from '@fixtures/ui.fixture';
+import { buildCheckoutInfo, pickRandomProductNames } from '@helpers/data.helper';
+import { AUTH_FILES, PRODUCTS } from '@config/constants';
+import { MESSAGES } from '@config/messages';
+import { addProductFromDetailPage, navigateToCheckoutStepTwo } from '@ui/helpers/flow.helper';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
@@ -34,7 +34,7 @@ test.describe('Checkout E2E', { tag: '@regression' }, () => {
       await allure.step('Verify inventory page displays with cart badge showing 1', async () => {
         await expect(page).toHaveURL(/inventory\.html/);
         const inventory = poManager.getInventoryPage();
-        expect(await inventory.isPageTitleVisible()).toBe(true);
+        await inventory.expectPageTitleVisible();
         expect(await inventory.getCartBadgeCount()).toBe(1);
       });
 
@@ -51,20 +51,20 @@ test.describe('Checkout E2E', { tag: '@regression' }, () => {
       await allure.step('Open cart page and verify all items are present', async () => {
         await poManager.getInventoryPage().goToCart();
         const cart = poManager.getCartPage();
-        expect(await cart.isTitleVisible()).toBe(true);
+        await cart.expectTitleVisible();
         expect(await cart.getCartItemCount()).toBe(selectedProducts.length);
       });
 
       await allure.step('Proceed to checkout and fill shipping information', async () => {
         await poManager.getCartPage().proceedToCheckout();
-        expect(await poManager.getCheckoutStepOnePage().isErrorVisible()).toBe(false);
+        await poManager.getCheckoutStepOnePage().expectErrorHidden();
         await navigateToCheckoutStepTwo(page, poManager, [], buildCheckoutInfo());
       });
 
       const stepTwo = poManager.getCheckoutStepTwoPage();
 
       await allure.step('Verify order summary items and price totals', async () => {
-        expect(await stepTwo.isFinishButtonVisible()).toBe(true);
+        await stepTwo.expectFinishButtonVisible();
         expect(await stepTwo.getItemCount()).toBe(selectedProducts.length);
 
         const itemNames = await stepTwo.getItemNames();
@@ -91,10 +91,10 @@ test.describe('Checkout E2E', { tag: '@regression' }, () => {
       await allure.step('Verify checkout success page is displayed', async () => {
         await expect(page).toHaveURL(/checkout-complete/);
         const complete = poManager.getCheckoutCompletePage();
-        expect(await complete.isSuccessHeaderVisible()).toBe(true);
+        await complete.expectSuccessHeaderVisible();
         expect(await complete.getSuccessHeader()).toContain(MESSAGES.CHECKOUT_COMPLETE.THANK_YOU);
         expect(await complete.getSuccessText()).toContain(MESSAGES.CHECKOUT_COMPLETE.DISPATCHED);
-        expect(await complete.isBackHomeButtonVisible()).toBe(true);
+        await complete.expectBackHomeButtonVisible();
       });
     },
   );
@@ -133,16 +133,16 @@ test.describe('Checkout E2E', { tag: '@regression' }, () => {
           await inventory.removeFromCartByName(name);
         }
         expect(await inventory.getCartBadgeCount()).toBe(1);
-        expect(await inventory.isAddToCartShownForProduct(PRODUCTS.BACKPACK.name)).toBe(true);
-        expect(await inventory.isAddToCartShownForProduct(PRODUCTS.BIKE_LIGHT.name)).toBe(true);
-        expect(await inventory.isRemoveShownForProduct(remainingProduct)).toBe(true);
+        await inventory.expectAddToCartShownForProduct(PRODUCTS.BACKPACK.name);
+        await inventory.expectAddToCartShownForProduct(PRODUCTS.BIKE_LIGHT.name);
+        await inventory.expectRemoveShownForProduct(remainingProduct);
       },
     );
 
     await allure.step('Open cart and verify removed products are not listed', async () => {
       await poManager.getInventoryPage().goToCart();
       const cart = poManager.getCartPage();
-      expect(await cart.isTitleVisible()).toBe(true);
+      await cart.expectTitleVisible();
       expect(await cart.getCartItemCount()).toBe(1);
       const cartNames = await cart.getCartItemNames();
       expect(cartNames).toContain(remainingProduct);
@@ -154,7 +154,7 @@ test.describe('Checkout E2E', { tag: '@regression' }, () => {
     await allure.step('Proceed to checkout information page', async () => {
       await poManager.getCartPage().proceedToCheckout();
       await expect(page).toHaveURL(/checkout-step-one/);
-      expect(await poManager.getCheckoutStepOnePage().isErrorVisible()).toBe(false);
+      await poManager.getCheckoutStepOnePage().expectErrorHidden();
     });
 
     await allure.step('Fill shipping information and continue to order overview', async () => {
@@ -173,7 +173,7 @@ test.describe('Checkout E2E', { tag: '@regression' }, () => {
     await allure.step(
       'Verify removed products are absent from order overview and totals match remaining item',
       async () => {
-        expect(await stepTwo.isFinishButtonVisible()).toBe(true);
+        await stepTwo.expectFinishButtonVisible();
         expect(await stepTwo.getItemCount()).toBe(1);
         const summaryNames = await stepTwo.getItemNames();
         expect(summaryNames).toContain(remainingProduct);
@@ -198,7 +198,7 @@ test.describe('Checkout E2E', { tag: '@regression' }, () => {
       'Verify order confirmation page shows success without removed products',
       async () => {
         const complete = poManager.getCheckoutCompletePage();
-        expect(await complete.isSuccessHeaderVisible()).toBe(true);
+        await complete.expectSuccessHeaderVisible();
         expect(await complete.getSuccessHeader()).toContain(MESSAGES.CHECKOUT_COMPLETE.THANK_YOU);
         expect(await complete.getSuccessText()).toContain(MESSAGES.CHECKOUT_COMPLETE.DISPATCHED);
         const confirmationText = [
@@ -252,7 +252,7 @@ test.describe('Checkout E2E', { tag: '@regression' }, () => {
       'Verify order overview shows only the initial product before leaving checkout',
       async () => {
         const stepTwo = poManager.getCheckoutStepTwoPage();
-        expect(await stepTwo.isFinishButtonVisible()).toBe(true);
+        await stepTwo.expectFinishButtonVisible();
         expect(await stepTwo.getItemCount()).toBe(1);
         expect(await stepTwo.getItemNames()).toContain(PRODUCTS.BACKPACK.name);
         expect(await stepTwo.getSubtotal()).toBeCloseTo(PRODUCTS.BACKPACK.price, 2);
@@ -262,7 +262,7 @@ test.describe('Checkout E2E', { tag: '@regression' }, () => {
     await allure.step('Cancel from order overview and return to inventory', async () => {
       await poManager.getCheckoutStepTwoPage().cancel();
       await expect(page).toHaveURL(/inventory\.html/);
-      expect(await poManager.getInventoryPage().isPageTitleVisible()).toBe(true);
+      await poManager.getInventoryPage().expectPageTitleVisible();
       expect(await poManager.getInventoryPage().getCartBadgeCount()).toBe(1);
     });
 
@@ -321,7 +321,7 @@ test.describe('Checkout E2E', { tag: '@regression' }, () => {
       await stepTwo.finish();
       await expect(page).toHaveURL(/checkout-complete/);
       const complete = poManager.getCheckoutCompletePage();
-      expect(await complete.isSuccessHeaderVisible()).toBe(true);
+      await complete.expectSuccessHeaderVisible();
       expect(await complete.getSuccessHeader()).toContain(MESSAGES.CHECKOUT_COMPLETE.THANK_YOU);
       expect(await complete.getSuccessText()).toContain(MESSAGES.CHECKOUT_COMPLETE.DISPATCHED);
     });

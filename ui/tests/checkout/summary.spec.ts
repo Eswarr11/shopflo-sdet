@@ -1,9 +1,9 @@
 import * as allure from 'allure-js-commons';
-import { setAllureTags } from '../../../helpers/allure-tags.helper';
-import { test, expect } from '../../../fixtures/ui.fixture';
-import { buildCheckoutInfo } from '../../../helpers/data.helper';
-import { PRODUCTS, AUTH_FILES } from '../../../config/constants';
-import { navigateToCheckoutStepTwo } from '../../helpers/flow.helper';
+import { setAllureTags } from '@helpers/allure-tags.helper';
+import { test, expect } from '@fixtures/ui.fixture';
+import { buildCheckoutInfo } from '@helpers/data.helper';
+import { PRODUCTS, AUTH_FILES } from '@config/constants';
+import { navigateToCheckoutStepTwo } from '@ui/helpers/flow.helper';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
@@ -26,7 +26,7 @@ test.describe('Order summary accuracy', { tag: '@regression' }, () => {
     const stepTwo = poManager.getCheckoutStepTwoPage();
 
     await allure.step('Verify subtotal equals sum of product prices', async () => {
-      expect(await stepTwo.isFinishButtonVisible()).toBe(true);
+      await stepTwo.expectFinishButtonVisible();
       expect(await stepTwo.getItemCount()).toBe(2);
       const itemNames = await stepTwo.getItemNames();
       expect(itemNames).toContain(PRODUCTS.BACKPACK.name);
@@ -45,7 +45,7 @@ test.describe('Order summary accuracy', { tag: '@regression' }, () => {
     const stepTwo = poManager.getCheckoutStepTwoPage();
 
     await allure.step('Verify total equals subtotal plus tax', async () => {
-      expect(await stepTwo.isFinishButtonVisible()).toBe(true);
+      await stepTwo.expectFinishButtonVisible();
       expect(await stepTwo.getItemCount()).toBe(1);
       const itemNames = await stepTwo.getItemNames();
       expect(itemNames).toContain(PRODUCTS.ONESIE.name);

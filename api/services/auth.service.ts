@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { apiClient } from '../../helpers/api.client';
+import { apiClient } from '@helpers/api.client';
 
 export class AuthService {
   login(username: string, password: string): Promise<AxiosResponse> {

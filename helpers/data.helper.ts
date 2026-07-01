@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { PRODUCTS } from '../config/constants';
+import { PRODUCTS } from '@config/constants';
 import type { Cart } from '../api/schemas/cart.schema';
 
 interface CheckoutInfo {

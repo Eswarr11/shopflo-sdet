@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import { PwActions } from '../../helpers/pw-actions';
+import { PwActions } from '@helpers/pw-actions';
 
 export class BasePage {
   protected page: Page;

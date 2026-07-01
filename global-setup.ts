@@ -1,7 +1,7 @@
 import { chromium, FullConfig, Browser, Page } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
-import { USERS, PASSWORD } from './config/constants';
+import { USERS, PASSWORD } from '@config/constants';
 
 const AUTH_DIR = path.join(process.cwd(), '.auth');
 const FRESHNESS_MS = 24 * 60 * 60 * 1000;

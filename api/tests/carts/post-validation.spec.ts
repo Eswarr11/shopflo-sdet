@@ -1,8 +1,8 @@
 import { test } from '@playwright/test';
 import { CartsService } from '../../services/carts.service';
-import { assertApiErrorStatus } from '../../../helpers/api.assertions';
-import { buildCart } from '../../../helpers/data.helper';
-import { markKnownDefect } from '../../../helpers/known-defects.helper';
+import { assertApiErrorStatus } from '@helpers/api.assertions';
+import { buildCart } from '@helpers/data.helper';
+import { markKnownDefect } from '@helpers/known-defects.helper';
 
 const carts = new CartsService();
 

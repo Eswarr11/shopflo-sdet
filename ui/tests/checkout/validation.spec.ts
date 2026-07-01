@@ -1,9 +1,9 @@
 import * as allure from 'allure-js-commons';
-import { setAllureTags } from '../../../helpers/allure-tags.helper';
-import { test, expect } from '../../../fixtures/ui.fixture';
-import { PRODUCTS, AUTH_FILES } from '../../../config/constants';
-import { MESSAGES } from '../../../config/messages';
-import { navigateToCheckoutStepOne } from '../../helpers/flow.helper';
+import { setAllureTags } from '@helpers/allure-tags.helper';
+import { test, expect } from '@fixtures/ui.fixture';
+import { PRODUCTS, AUTH_FILES } from '@config/constants';
+import { MESSAGES } from '@config/messages';
+import { navigateToCheckoutStepOne } from '@ui/helpers/flow.helper';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
@@ -13,7 +13,7 @@ test.describe('Verify Mandatory Customer Information Validation', { tag: '@regre
     await allure.story('Step 1 Validation');
     await setAllureTags('High', 'High');
     await navigateToCheckoutStepOne(poManager, [PRODUCTS.BACKPACK.name]);
-    expect(await poManager.getCheckoutStepOnePage().isErrorVisible()).toBe(false);
+    await poManager.getCheckoutStepOnePage().expectErrorHidden();
   });
 
   test('missing first name shows "First Name is required" error', async ({ poManager }) => {
@@ -23,7 +23,7 @@ test.describe('Verify Mandatory Customer Information Validation', { tag: '@regre
       await stepOne.continue();
     });
     await allure.step('Verify first name validation error', async () => {
-      expect(await stepOne.isErrorVisible()).toBe(true);
+      await stepOne.expectErrorVisible();
       expect(await stepOne.getErrorMessage()).toContain(MESSAGES.CHECKOUT.FIRST_NAME);
     });
   });
@@ -35,7 +35,7 @@ test.describe('Verify Mandatory Customer Information Validation', { tag: '@regre
       await stepOne.continue();
     });
     await allure.step('Verify last name validation error', async () => {
-      expect(await stepOne.isErrorVisible()).toBe(true);
+      await stepOne.expectErrorVisible();
       expect(await stepOne.getErrorMessage()).toContain(MESSAGES.CHECKOUT.LAST_NAME);
     });
   });
@@ -47,7 +47,7 @@ test.describe('Verify Mandatory Customer Information Validation', { tag: '@regre
       await stepOne.continue();
     });
     await allure.step('Verify postal code validation error', async () => {
-      expect(await stepOne.isErrorVisible()).toBe(true);
+      await stepOne.expectErrorVisible();
       expect(await stepOne.getErrorMessage()).toContain(MESSAGES.CHECKOUT.POSTAL_CODE);
     });
   });
@@ -60,7 +60,7 @@ test.describe('Verify Mandatory Customer Information Validation', { tag: '@regre
       await stepOne.continue();
     });
     await allure.step('Verify first name validation error is shown first', async () => {
-      expect(await stepOne.isErrorVisible()).toBe(true);
+      await stepOne.expectErrorVisible();
       expect(await stepOne.getErrorMessage()).toContain(MESSAGES.CHECKOUT.FIRST_NAME);
     });
   });

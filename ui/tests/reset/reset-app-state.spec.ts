@@ -1,14 +1,14 @@
 import * as allure from 'allure-js-commons';
-import { setAllureTags } from '../../../helpers/allure-tags.helper';
-import { markKnownDefect } from '../../../helpers/known-defects.helper';
-import { test, expect } from '../../../fixtures/ui.fixture';
-import { buildCheckoutInfo } from '../../../helpers/data.helper';
-import { AUTH_FILES, PRODUCTS } from '../../../config/constants';
+import { setAllureTags } from '@helpers/allure-tags.helper';
+import { markKnownDefect } from '@helpers/known-defects.helper';
+import { test, expect } from '@fixtures/ui.fixture';
+import { buildCheckoutInfo } from '@helpers/data.helper';
+import { AUTH_FILES, PRODUCTS } from '@config/constants';
 import {
   addProductsToCart,
   navigateToCart,
   openBurgerMenuAndReset,
-} from '../../helpers/flow.helper';
+} from '@ui/helpers/flow.helper';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
@@ -26,7 +26,7 @@ test.describe('Reset App State', { tag: ['@regression', '@known-defect'] }, () =
       await addProductsToCart(poManager, products);
       expect(await poManager.getInventoryPage().getCartBadgeCount()).toBe(2);
       for (const name of products) {
-        expect(await poManager.getInventoryPage().isRemoveShownForProduct(name)).toBe(true);
+        await poManager.getInventoryPage().expectRemoveShownForProduct(name);
       }
     });
 
@@ -36,11 +36,11 @@ test.describe('Reset App State', { tag: ['@regression', '@known-defect'] }, () =
 
     await allure.step('Verify cart badge cleared and Add to Cart buttons restored', async () => {
       const inventory = poManager.getInventoryPage();
-      expect(await inventory.isCartBadgeVisible()).toBe(false);
+      await inventory.expectCartBadgeHidden();
       expect(await inventory.getCartBadgeCount()).toBe(0);
       for (const name of products) {
-        expect(await inventory.isAddToCartShownForProduct(name)).toBe(true);
-        expect(await inventory.isRemoveShownForProduct(name)).toBe(false);
+        await inventory.expectAddToCartShownForProduct(name);
+        await inventory.expectRemoveHiddenForProduct(name);
       }
     });
   });
@@ -63,7 +63,7 @@ test.describe('Reset App State', { tag: ['@regression', '@known-defect'] }, () =
       expect(await poManager.getInventoryPage().getCartBadgeCount()).toBe(0);
       const cart = poManager.getCartPage();
       expect(await cart.getCartItemCount()).toBe(0);
-      expect(await cart.isCheckoutButtonVisible()).toBe(true);
+      await cart.expectCheckoutButtonVisible();
     });
   });
 

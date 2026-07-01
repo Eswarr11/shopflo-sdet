@@ -8,7 +8,14 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "moduleResolution": "node",
-    "sourceMap": true
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@fixtures/*": ["fixtures/*"],
+      "@helpers/*": ["helpers/*"],
+      "@config/*": ["config/*"],
+      "@ui/*": ["ui/*"]
+    }
   },
   "include": ["**/*.ts"],
   "exclude": [

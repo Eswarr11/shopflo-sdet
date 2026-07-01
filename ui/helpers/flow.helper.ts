@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 import { POManager } from '../pages/po-manager';
-import { buildCheckoutInfo } from '../../helpers/data.helper';
+import { buildCheckoutInfo } from '@helpers/data.helper';
 
 export async function addProductsToCart(
   poManager: POManager,
@@ -72,8 +72,7 @@ export async function assertInventoryLoaded(
 ): Promise<void> {
   const inventory = poManager.getInventoryPage();
   await inventory.goto();
-  const titleVisible = await inventory.isPageTitleVisible();
-  if (!titleVisible) throw new Error('Inventory page title is not visible');
+  await inventory.expectPageTitleVisible();
   const count = await inventory.getProductCount();
   if (count !== expectedCount) throw new Error(`Expected ${expectedCount} products, got ${count}`);
 }

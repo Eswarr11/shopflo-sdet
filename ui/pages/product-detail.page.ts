@@ -28,16 +28,20 @@ export class ProductDetailPage extends BasePage {
     await this.actions.click(this.SEL.addToCartButton, 'add to cart button');
   }
 
-  async isDescriptionVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.productDescription, 'product description');
+  async expectDescriptionVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.productDescription, 'product description');
   }
 
-  async isAddToCartButtonVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.addToCartButton, 'add to cart button');
+  async expectAddToCartButtonVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.addToCartButton, 'add to cart button');
   }
 
-  async isRemoveButtonVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.removeButton, 'remove from cart button');
+  async expectAddToCartButtonHidden(): Promise<void> {
+    await this.actions.expectHidden(this.SEL.addToCartButton, 'add to cart button');
+  }
+
+  async expectRemoveButtonVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.removeButton, 'remove from cart button');
   }
 
   async goBack(): Promise<void> {

@@ -16,15 +16,15 @@ export class CheckoutCompletePage extends BasePage {
     return this.actions.getText(this.SEL.successHeader, 'success header');
   }
 
-  isSuccessHeaderVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.successHeader, 'success header');
+  async expectSuccessHeaderVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.successHeader, 'success header');
   }
 
   async getSuccessText(): Promise<string | null> {
     return this.actions.getText(this.SEL.successText, 'success text');
   }
 
-  async isBackHomeButtonVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.backHomeButton, 'back home button');
+  async expectBackHomeButtonVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.backHomeButton, 'back home button');
   }
 }

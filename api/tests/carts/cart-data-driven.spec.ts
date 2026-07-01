@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { CartsService } from '../../services/carts.service';
-import { CommonUtils } from '../../../helpers/common-utils';
-import { buildCart } from '../../../helpers/data.helper';
-import { expectSuccessStatus } from '../../../helpers/api.assertions';
+import { CommonUtils } from '@helpers/common-utils';
+import { buildCart } from '@helpers/data.helper';
+import { expectSuccessStatus } from '@helpers/api.assertions';
 
 interface ProductTestCase {
   productId: number;

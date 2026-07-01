@@ -1,6 +1,6 @@
 import { Locator, Page } from '@playwright/test';
 import { BasePage } from '../base.page';
-import { CommonUtils } from '../../../helpers/common-utils';
+import { CommonUtils } from '@helpers/common-utils';
 
 export class CheckoutStepTwoPage extends BasePage {
   private readonly SEL = {
@@ -58,8 +58,8 @@ export class CheckoutStepTwoPage extends BasePage {
     await this.actions.click(this.SEL.cancelButton, 'cancel button');
   }
 
-  async isFinishButtonVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.finishButton, 'finish button');
+  async expectFinishButtonVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.finishButton, 'finish button');
   }
 
   async getItemCount(): Promise<number> {

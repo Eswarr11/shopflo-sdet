@@ -38,6 +38,13 @@ export const KNOWN_DEFECTS = {
 
 type KnownDefectKey = keyof typeof KNOWN_DEFECTS;
 
+export async function annotateKnownDefect(key: KnownDefectKey): Promise<void> {
+  const defect = KNOWN_DEFECTS[key];
+  await allure.label('known-defect', defect.id);
+  await allure.tag('known-defect');
+  await allure.description(`Known application defect [${defect.id}]: ${defect.summary}`);
+}
+
 export async function markKnownDefect(key: KnownDefectKey): Promise<void> {
   const defect = KNOWN_DEFECTS[key];
   test.fail(true, `[${defect.id}] ${defect.summary}`);

@@ -40,12 +40,12 @@ export class CartPage extends BasePage {
     await this.actions.click(this.SEL.continueShoppingButton, 'continue shopping button');
   }
 
-  async isTitleVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.pageTitle, 'cart page title');
+  async expectTitleVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.pageTitle, 'cart page title');
   }
 
-  async isCheckoutButtonVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.checkoutButton, 'checkout button');
+  async expectCheckoutButtonVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.checkoutButton, 'checkout button');
   }
 
   async proceedToCheckout(): Promise<void> {

@@ -1,4 +1,4 @@
-import { setAuthToken } from '../helpers/api.client';
+import { setAuthToken } from './api.client';
 
 export async function withAuthToken<T>(token: string, fn: () => Promise<T>): Promise<T> {
   setAuthToken(token);
@@ -16,4 +16,8 @@ export async function withoutAuthToken<T>(fn: () => Promise<T>): Promise<T> {
   } finally {
     setAuthToken(null);
   }
+}
+
+export function clearAuthToken(): void {
+  setAuthToken(null);
 }

@@ -30,7 +30,7 @@ export class BurgerMenuComponent extends BasePage {
     await this.actions.click(this.SEL.closeButton, 'burger menu close button');
   }
 
-  async isLogoutLinkVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.logoutLink, 'Logout link');
+  async expectLogoutLinkVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.logoutLink, 'Logout link');
   }
 }

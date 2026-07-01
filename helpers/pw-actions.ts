@@ -1,4 +1,4 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 import logger from './logger';
 
 export class PwActions {
@@ -163,5 +163,23 @@ export class PwActions {
     logger.info(`Waiting for "${description}" to be visible`);
     await this.getLocator(selector).waitFor({ state: 'visible', timeout });
     logger.info(`"${description}" is now visible`);
+  }
+
+  async expectVisible(selector: string | Locator, description = 'element'): Promise<void> {
+    logger.info(`Asserting "${description}" is visible`);
+    await expect(this.getLocator(selector), `${description} should be visible`).toBeVisible();
+    logger.info(`"${description}" is visible`);
+  }
+
+  async expectHidden(selector: string | Locator, description = 'element'): Promise<void> {
+    logger.info(`Asserting "${description}" is hidden`);
+    await expect(this.getLocator(selector), `${description} should be hidden`).toBeHidden();
+    logger.info(`"${description}" is hidden`);
+  }
+
+  async expectEditable(selector: string | Locator, description = 'element'): Promise<void> {
+    logger.info(`Asserting "${description}" is editable`);
+    await expect(this.getLocator(selector), `${description} should be editable`).toBeEditable();
+    logger.info(`"${description}" is editable`);
   }
 }

@@ -8,10 +8,10 @@ import { test, expect } from '@playwright/test';
 import { CartsService } from '../../services/carts.service';
 import { AuthService } from '../../services/auth.service';
 import { CartSchema } from '../../schemas/cart.schema';
-import { assertSchema, expectSuccessStatus } from '../../../helpers/api.assertions';
-import { withAuthToken } from '../../../fixtures/api.fixture';
-import { API_USERS } from '../../../config/constants';
-import { buildCart } from '../../../helpers/data.helper';
+import { assertSchema, expectSuccessStatus } from '@helpers/api.assertions';
+import { withAuthToken } from '@helpers/api-auth.util';
+import { API_USERS } from '@config/constants';
+import { buildCart } from '@helpers/data.helper';
 
 const carts = new CartsService();
 const auth = new AuthService();
@@ -49,6 +49,10 @@ test.describe('Cart CRUD — Positive Cases', { tag: '@regression' }, () => {
     const res = await carts.delete(6);
     expectSuccessStatus(res.status);
     expect(res.data.id).toBe(6);
+
+    const followUp = await carts.getById(6);
+    expectSuccessStatus(followUp.status);
+    expect(followUp.data.id).toBe(6);
   });
 });
 

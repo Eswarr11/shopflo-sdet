@@ -27,7 +27,11 @@ export class LoginPage extends BasePage {
     return this.actions.getText(this.SEL.error, 'login error message');
   }
 
-  async isErrorVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.error, 'login error message');
+  async expectErrorVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.error, 'login error message');
+  }
+
+  async expectErrorHidden(): Promise<void> {
+    await this.actions.expectHidden(this.SEL.error, 'login error message');
   }
 }

@@ -9,10 +9,13 @@ export const USERS = {
   VISUAL: 'visual_user',
 } as const;
 
-export const PASSWORD = 'secret_sauce';
+export const PASSWORD = process.env.UI_PASSWORD || 'secret_sauce';
 
 export const API_USERS = {
-  VALID: { username: 'mor_2314', password: '83r5^_' },
+  VALID: {
+    username: process.env.API_USERNAME || 'mor_2314',
+    password: process.env.API_PASSWORD || '83r5^_',
+  },
 } as const;
 
 export const PRODUCTS = {

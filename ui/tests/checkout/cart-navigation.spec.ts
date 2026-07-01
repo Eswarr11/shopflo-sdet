@@ -1,10 +1,10 @@
 import * as allure from 'allure-js-commons';
-import { setAllureTags } from '../../../helpers/allure-tags.helper';
-import { test, expect } from '../../../fixtures/ui.fixture';
-import { buildCheckoutInfo } from '../../../helpers/data.helper';
-import { AUTH_FILES, PRODUCTS } from '../../../config/constants';
-import { MESSAGES } from '../../../config/messages';
-import { navigateToCheckoutStepTwo } from '../../helpers/flow.helper';
+import { setAllureTags } from '@helpers/allure-tags.helper';
+import { test, expect } from '@fixtures/ui.fixture';
+import { buildCheckoutInfo } from '@helpers/data.helper';
+import { AUTH_FILES, PRODUCTS } from '@config/constants';
+import { MESSAGES } from '@config/messages';
+import { navigateToCheckoutStepTwo } from '@ui/helpers/flow.helper';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
@@ -46,7 +46,7 @@ test.describe('Verify Cart Navigation From Order Confirmation Page', { tag: '@re
       await poManager.getCheckoutStepTwoPage().finish();
       await expect(page).toHaveURL(/checkout-complete/);
       const complete = poManager.getCheckoutCompletePage();
-      expect(await complete.isSuccessHeaderVisible()).toBe(true);
+      await complete.expectSuccessHeaderVisible();
       expect(await complete.getSuccessHeader()).toContain(MESSAGES.CHECKOUT_COMPLETE.THANK_YOU);
     });
 
@@ -54,7 +54,7 @@ test.describe('Verify Cart Navigation From Order Confirmation Page', { tag: '@re
       await poManager.getHeader().goToCart();
       await expect(page).toHaveURL(/cart\.html/);
       const cart = poManager.getCartPage();
-      expect(await cart.isTitleVisible()).toBe(true);
+      await cart.expectTitleVisible();
     });
   });
 });

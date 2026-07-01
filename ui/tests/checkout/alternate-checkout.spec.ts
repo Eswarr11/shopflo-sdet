@@ -1,9 +1,9 @@
 import * as allure from 'allure-js-commons';
-import { setAllureTags } from '../../../helpers/allure-tags.helper';
-import { test, expect } from '../../../fixtures/ui.fixture';
-import { buildCheckoutInfo } from '../../../helpers/data.helper';
-import { AUTH_FILES, PRODUCTS } from '../../../config/constants';
-import { MESSAGES } from '../../../config/messages';
+import { setAllureTags } from '@helpers/allure-tags.helper';
+import { test, expect } from '@fixtures/ui.fixture';
+import { buildCheckoutInfo } from '@helpers/data.helper';
+import { AUTH_FILES, PRODUCTS } from '@config/constants';
+import { MESSAGES } from '@config/messages';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
@@ -19,16 +19,16 @@ test.describe('Verify Alternate Checkout Flow for Standard User', { tag: '@regre
       await inventory.clickProduct(PRODUCTS.BACKPACK.name);
       await expect(page).toHaveURL(/inventory-item/);
       const detail = poManager.getProductDetailPage();
-      expect(await detail.isAddToCartButtonVisible()).toBe(true);
+      await detail.expectAddToCartButtonVisible();
       await detail.addToCart();
-      expect(await detail.isRemoveButtonVisible()).toBe(true);
+      await detail.expectRemoveButtonVisible();
     });
 
     await allure.step('Open cart and verify selected product is listed', async () => {
       await poManager.getProductDetailPage().goBack();
       await poManager.getInventoryPage().goToCart();
       const cart = poManager.getCartPage();
-      expect(await cart.isTitleVisible()).toBe(true);
+      await cart.expectTitleVisible();
       expect(await cart.getCartItemCount()).toBe(1);
       expect(await cart.getCartItemNames()).toContain(PRODUCTS.BACKPACK.name);
     });
@@ -57,7 +57,7 @@ test.describe('Verify Alternate Checkout Flow for Standard User', { tag: '@regre
     await allure.step('Verify Thank you for your order page is displayed', async () => {
       await expect(page).toHaveURL(/checkout-complete/);
       const complete = poManager.getCheckoutCompletePage();
-      expect(await complete.isSuccessHeaderVisible()).toBe(true);
+      await complete.expectSuccessHeaderVisible();
       expect(await complete.getSuccessHeader()).toContain(MESSAGES.CHECKOUT_COMPLETE.THANK_YOU);
     });
   });

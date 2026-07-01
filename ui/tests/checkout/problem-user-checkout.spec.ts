@@ -1,10 +1,10 @@
 import * as allure from 'allure-js-commons';
-import { setAllureTags } from '../../../helpers/allure-tags.helper';
-import { markKnownDefect } from '../../../helpers/known-defects.helper';
-import { test, expect } from '../../../fixtures/ui.fixture';
-import { buildCheckoutInfo } from '../../../helpers/data.helper';
-import { AUTH_FILES, PRODUCTS } from '../../../config/constants';
-import { addProductsToCart } from '../../helpers/flow.helper';
+import { setAllureTags } from '@helpers/allure-tags.helper';
+import { markKnownDefect } from '@helpers/known-defects.helper';
+import { test, expect } from '@fixtures/ui.fixture';
+import { buildCheckoutInfo } from '@helpers/data.helper';
+import { AUTH_FILES, PRODUCTS } from '@config/constants';
+import { addProductsToCart } from '@ui/helpers/flow.helper';
 
 test.use({ storageState: AUTH_FILES.PROBLEM_USER });
 
@@ -34,7 +34,7 @@ test.describe(
       await allure.step(
         'Verify Last Name field is editable and fill checkout information',
         async () => {
-          expect(await stepOne.isLastNameEditable()).toBe(true);
+          await stepOne.expectLastNameEditable();
           await stepOne.fillShippingInfo(
             checkoutInfo.firstName,
             checkoutInfo.lastName,
@@ -51,7 +51,7 @@ test.describe(
         expect(await stepTwo.getItemCount()).toBe(2);
         await stepTwo.finish();
         await expect(page).toHaveURL(/checkout-complete/);
-        expect(await poManager.getCheckoutCompletePage().isSuccessHeaderVisible()).toBe(true);
+        await poManager.getCheckoutCompletePage().expectSuccessHeaderVisible();
       });
     });
   },

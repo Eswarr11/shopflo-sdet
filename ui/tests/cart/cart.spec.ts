@@ -1,8 +1,8 @@
 import * as allure from 'allure-js-commons';
-import { setAllureTags } from '../../../helpers/allure-tags.helper';
-import { test, expect } from '../../../fixtures/ui.fixture';
-import { PRODUCTS, AUTH_FILES } from '../../../config/constants';
-import { addProductsToCart } from '../../helpers/flow.helper';
+import { setAllureTags } from '@helpers/allure-tags.helper';
+import { test, expect } from '@fixtures/ui.fixture';
+import { PRODUCTS, AUTH_FILES } from '@config/constants';
+import { addProductsToCart } from '@ui/helpers/flow.helper';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
@@ -21,7 +21,7 @@ test.describe('Cart operations', { tag: '@regression' }, () => {
     });
     await allure.step('Verify both products appear in cart', async () => {
       const cart = poManager.getCartPage();
-      expect(await cart.isTitleVisible()).toBe(true);
+      await cart.expectTitleVisible();
       expect(await cart.getCartItemCount()).toBe(2);
       const names = await cart.getCartItemNames();
       expect(names).toContain(PRODUCTS.BACKPACK.name);
@@ -52,13 +52,13 @@ test.describe('Cart operations', { tag: '@regression' }, () => {
       await poManager.getInventoryPage().goto();
       await poManager.getInventoryPage().goToCart();
       const cart = poManager.getCartPage();
-      expect(await cart.isTitleVisible()).toBe(true);
+      await cart.expectTitleVisible();
       await cart.continueShopping();
     });
     await allure.step('Verify inventory page is displayed with all products', async () => {
       await expect(page).toHaveURL(/inventory\.html/);
       const inventory = poManager.getInventoryPage();
-      expect(await inventory.isPageTitleVisible()).toBe(true);
+      await inventory.expectPageTitleVisible();
       expect(await inventory.getProductCount()).toBe(6);
     });
   });
@@ -71,9 +71,9 @@ test.describe('Cart operations', { tag: '@regression' }, () => {
     });
     await allure.step('Verify cart is empty with checkout button visible', async () => {
       const cart = poManager.getCartPage();
-      expect(await cart.isTitleVisible()).toBe(true);
+      await cart.expectTitleVisible();
       expect(await cart.getCartItemCount()).toBe(0);
-      expect(await cart.isCheckoutButtonVisible()).toBe(true);
+      await cart.expectCheckoutButtonVisible();
     });
   });
 });

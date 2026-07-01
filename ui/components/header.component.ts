@@ -19,8 +19,12 @@ export class HeaderComponent extends BasePage {
     return parseInt(text ?? '0', 10);
   }
 
-  async isCartBadgeVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.cartBadge, 'cart badge');
+  async expectCartBadgeVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.cartBadge, 'cart badge');
+  }
+
+  async expectCartBadgeHidden(): Promise<void> {
+    await this.actions.expectHidden(this.SEL.cartBadge, 'cart badge');
   }
 
   async openBurgerMenu(): Promise<void> {

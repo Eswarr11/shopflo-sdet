@@ -45,35 +45,39 @@ export class CheckoutStepOnePage extends BasePage {
     return this.actions.getText(this.SEL.errorMessage, 'checkout error message');
   }
 
-  isErrorVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.errorMessage, 'checkout error message');
+  async expectErrorVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.errorMessage, 'checkout error message');
   }
 
-  async isLastNameEditable(): Promise<boolean> {
-    return this.actions.isEditable(this.SEL.lastNameInput, 'last name field');
+  async expectErrorHidden(): Promise<void> {
+    await this.actions.expectHidden(this.SEL.errorMessage, 'checkout error message');
+  }
+
+  async expectLastNameEditable(): Promise<void> {
+    await this.actions.expectEditable(this.SEL.lastNameInput, 'last name field');
   }
 
   async getLastNameValue(): Promise<string> {
     return this.actions.getInputValue(this.SEL.lastNameInput, 'last name field');
   }
 
-  async isFirstNameVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.firstNameInput, 'first name field');
+  async expectFirstNameVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.firstNameInput, 'first name field');
   }
 
-  async isLastNameVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.lastNameInput, 'last name field');
+  async expectLastNameVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.lastNameInput, 'last name field');
   }
 
-  async isZipCodeVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.zipCodeInput, 'zip code field');
+  async expectZipCodeVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.zipCodeInput, 'zip code field');
   }
 
-  async isContinueButtonVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.continueButton, 'continue button');
+  async expectContinueButtonVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.continueButton, 'continue button');
   }
 
-  async isCancelButtonVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.cancelButton, 'cancel button');
+  async expectCancelButtonVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.cancelButton, 'cancel button');
   }
 }

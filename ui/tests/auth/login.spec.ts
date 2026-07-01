@@ -1,8 +1,8 @@
 import * as allure from 'allure-js-commons';
-import { setAllureTags } from '../../../helpers/allure-tags.helper';
-import { test, expect } from '../../../fixtures/ui.fixture';
-import { USERS, PASSWORD } from '../../../config/constants';
-import { MESSAGES } from '../../../config/messages';
+import { setAllureTags } from '@helpers/allure-tags.helper';
+import { test, expect } from '@fixtures/ui.fixture';
+import { USERS, PASSWORD } from '@config/constants';
+import { MESSAGES } from '@config/messages';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -25,7 +25,7 @@ test.describe('Login', { tag: '@regression' }, () => {
         await allure.step('Verify inventory page is displayed with 6 products', async () => {
           await expect(page).toHaveURL(/inventory/);
           const inventory = poManager.getInventoryPage();
-          expect(await inventory.isPageTitleVisible()).toBe(true);
+          await inventory.expectPageTitleVisible();
           expect(await inventory.getProductCount()).toBe(6);
         });
       },
@@ -43,7 +43,7 @@ test.describe('Login', { tag: '@regression' }, () => {
         'Verify locked-out error is shown and user stays on login page',
         async () => {
           await expect(page).not.toHaveURL(/inventory/);
-          expect(await loginPage.isErrorVisible()).toBe(true);
+          await loginPage.expectErrorVisible();
           expect(await loginPage.getErrorMessage()).toContain(MESSAGES.LOGIN.LOCKED_OUT);
         },
       );
@@ -57,7 +57,7 @@ test.describe('Login', { tag: '@regression' }, () => {
       });
       await allure.step('Verify credentials mismatch error', async () => {
         await expect(page).not.toHaveURL(/inventory/);
-        expect(await loginPage.isErrorVisible()).toBe(true);
+        await loginPage.expectErrorVisible();
         expect(await loginPage.getErrorMessage()).toContain(MESSAGES.LOGIN.CREDENTIALS_MISMATCH);
       });
     });
@@ -70,7 +70,7 @@ test.describe('Login', { tag: '@regression' }, () => {
       });
       await allure.step('Verify username required error', async () => {
         await expect(page).not.toHaveURL(/inventory/);
-        expect(await loginPage.isErrorVisible()).toBe(true);
+        await loginPage.expectErrorVisible();
         expect(await loginPage.getErrorMessage()).toContain(MESSAGES.LOGIN.USERNAME_REQUIRED);
       });
     });
@@ -83,7 +83,7 @@ test.describe('Login', { tag: '@regression' }, () => {
       });
       await allure.step('Verify password required error', async () => {
         await expect(page).not.toHaveURL(/inventory/);
-        expect(await loginPage.isErrorVisible()).toBe(true);
+        await loginPage.expectErrorVisible();
         expect(await loginPage.getErrorMessage()).toContain(MESSAGES.LOGIN.PASSWORD_REQUIRED);
       });
     });
@@ -96,7 +96,7 @@ test.describe('Login', { tag: '@regression' }, () => {
       });
       await allure.step('Verify username required error is shown first', async () => {
         await expect(page).not.toHaveURL(/inventory/);
-        expect(await loginPage.isErrorVisible()).toBe(true);
+        await loginPage.expectErrorVisible();
         expect(await loginPage.getErrorMessage()).toContain(MESSAGES.LOGIN.USERNAME_REQUIRED);
       });
     });

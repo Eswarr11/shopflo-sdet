@@ -1,7 +1,7 @@
 import * as allure from 'allure-js-commons';
-import { setAllureTags } from '../../../helpers/allure-tags.helper';
-import { test, expect } from '../../../fixtures/ui.fixture';
-import { PRODUCTS, AUTH_FILES } from '../../../config/constants';
+import { setAllureTags } from '@helpers/allure-tags.helper';
+import { test, expect } from '@fixtures/ui.fixture';
+import { PRODUCTS, AUTH_FILES } from '@config/constants';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
@@ -60,7 +60,9 @@ test.describe('Inventory — Add / Remove from Cart', { tag: '@regression' }, ()
     test('Verify Cart Badge Hidden When Cart Empty', async ({ poManager }) => {
       await setAllureTags('Medium', 'Low');
       await allure.step('Verify cart badge is not visible when cart is empty', async () => {
-        expect(await poManager.getInventoryPage().isCartBadgeVisible()).toBe(false);
+        const inventory = poManager.getInventoryPage();
+        expect(await inventory.getCartBadgeCount()).toBe(0);
+        await inventory.expectCartBadgeHidden();
       });
     });
   });

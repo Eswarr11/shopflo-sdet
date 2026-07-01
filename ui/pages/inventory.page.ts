@@ -1,7 +1,7 @@
 import { Locator, Page } from '@playwright/test';
 import { BasePage } from './base.page';
 import { HeaderComponent } from '../components/header.component';
-import { CommonUtils } from '../../helpers/common-utils';
+import { CommonUtils } from '@helpers/common-utils';
 
 export class InventoryPage extends BasePage {
   private readonly header: HeaderComponent;
@@ -73,8 +73,12 @@ export class InventoryPage extends BasePage {
     return this.header.getCartCount();
   }
 
-  async isCartBadgeVisible(): Promise<boolean> {
-    return this.header.isCartBadgeVisible();
+  async expectCartBadgeVisible(): Promise<void> {
+    await this.header.expectCartBadgeVisible();
+  }
+
+  async expectCartBadgeHidden(): Promise<void> {
+    await this.header.expectCartBadgeHidden();
   }
 
   async getMismatchedProductImageCount(
@@ -118,8 +122,8 @@ export class InventoryPage extends BasePage {
     return this.actions.getCount(this.SEL.productItems, 'inventory items');
   }
 
-  async isPageTitleVisible(): Promise<boolean> {
-    return this.actions.isVisible(this.SEL.pageTitle, 'inventory page title');
+  async expectPageTitleVisible(): Promise<void> {
+    await this.actions.expectVisible(this.SEL.pageTitle, 'inventory page title');
   }
 
   async waitForLoad(): Promise<void> {
@@ -131,16 +135,27 @@ export class InventoryPage extends BasePage {
     await this.header.goToCart();
   }
 
-  async isAddToCartShownForProduct(productName: string): Promise<boolean> {
+  async expectAddToCartShownForProduct(productName: string): Promise<void> {
     const item = this.getProductItemByName(productName);
-    return this.actions.isVisible(
+    await this.actions.expectVisible(
       item.locator(this.SEL.addToCartButton),
       `add to cart — ${productName}`,
     );
   }
 
-  async isRemoveShownForProduct(productName: string): Promise<boolean> {
+  async expectRemoveShownForProduct(productName: string): Promise<void> {
     const item = this.getProductItemByName(productName);
-    return this.actions.isVisible(item.locator(this.SEL.removeButton), `remove — ${productName}`);
+    await this.actions.expectVisible(
+      item.locator(this.SEL.removeButton),
+      `remove — ${productName}`,
+    );
+  }
+
+  async expectRemoveHiddenForProduct(productName: string): Promise<void> {
+    const item = this.getProductItemByName(productName);
+    await this.actions.expectHidden(
+      item.locator(this.SEL.removeButton),
+      `remove — ${productName}`,
+    );
   }
 }

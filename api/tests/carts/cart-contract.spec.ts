@@ -14,7 +14,7 @@
 
 import { test, expect } from '@playwright/test';
 import { CartsService } from '../../services/carts.service';
-import { assertFieldTypes } from '../../../helpers/api.assertions';
+import { assertFieldTypes } from '@helpers/api.assertions';
 import snapshot from './contract-snapshots/cart.snapshot.json';
 
 const carts = new CartsService();

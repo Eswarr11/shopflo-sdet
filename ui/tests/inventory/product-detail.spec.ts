@@ -1,7 +1,7 @@
 import * as allure from 'allure-js-commons';
-import { setAllureTags } from '../../../helpers/allure-tags.helper';
-import { test, expect } from '../../../fixtures/ui.fixture';
-import { PRODUCTS, AUTH_FILES } from '../../../config/constants';
+import { setAllureTags } from '@helpers/allure-tags.helper';
+import { test, expect } from '@fixtures/ui.fixture';
+import { PRODUCTS, AUTH_FILES } from '@config/constants';
 
 test.use({ storageState: AUTH_FILES.STANDARD_USER });
 
@@ -24,8 +24,8 @@ test.describe('Product detail page', { tag: '@regression' }, () => {
       });
       await allure.step('Verify description and add-to-cart button are visible', async () => {
         const detail = poManager.getProductDetailPage();
-        expect(await detail.isDescriptionVisible()).toBe(true);
-        expect(await detail.isAddToCartButtonVisible()).toBe(true);
+        await detail.expectDescriptionVisible();
+        await detail.expectAddToCartButtonVisible();
       });
     },
   );
@@ -39,7 +39,7 @@ test.describe('Product detail page', { tag: '@regression' }, () => {
       const detail = poManager.getProductDetailPage();
       expect(await detail.getProductName()).toContain(PRODUCTS.BACKPACK.name);
       expect(await detail.getProductPrice()).toBe(PRODUCTS.BACKPACK.price);
-      expect(await detail.isDescriptionVisible()).toBe(true);
+      await detail.expectDescriptionVisible();
     });
   });
 
@@ -50,10 +50,10 @@ test.describe('Product detail page', { tag: '@regression' }, () => {
       await inventory.goto();
       await inventory.clickProduct(PRODUCTS.FLEECE_JACKET.name);
       const detail = poManager.getProductDetailPage();
-      expect(await detail.isAddToCartButtonVisible()).toBe(true);
+      await detail.expectAddToCartButtonVisible();
       await detail.addToCart();
-      expect(await detail.isRemoveButtonVisible()).toBe(true);
-      expect(await detail.isAddToCartButtonVisible()).toBe(false);
+      await detail.expectRemoveButtonVisible();
+      await detail.expectAddToCartButtonHidden();
       expect(await inventory.getCartBadgeCount()).toBe(1);
     });
   });
@@ -69,7 +69,7 @@ test.describe('Product detail page', { tag: '@regression' }, () => {
     });
     await allure.step('Verify all 6 products are visible on inventory', async () => {
       const inventory = poManager.getInventoryPage();
-      expect(await inventory.isPageTitleVisible()).toBe(true);
+      await inventory.expectPageTitleVisible();
       expect(await inventory.getProductCount()).toBe(6);
     });
   });

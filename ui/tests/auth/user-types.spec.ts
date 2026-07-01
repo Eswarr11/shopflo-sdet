@@ -1,7 +1,7 @@
 import * as allure from 'allure-js-commons';
-import { setAllureTags } from '../../../helpers/allure-tags.helper';
-import { test, expect } from '../../../fixtures/ui.fixture';
-import { USERS, PASSWORD, AUTH_FILES, PRODUCT_IMAGE_SLUGS } from '../../../config/constants';
+import { setAllureTags } from '@helpers/allure-tags.helper';
+import { test, expect } from '@fixtures/ui.fixture';
+import { USERS, PASSWORD, AUTH_FILES, PRODUCT_IMAGE_SLUGS } from '@config/constants';
 
 test.describe('User type behaviors', { tag: '@regression' }, () => {
   test.describe('Login-required scenarios', () => {
@@ -22,7 +22,7 @@ test.describe('User type behaviors', { tag: '@regression' }, () => {
       });
       await allure.step('Verify inventory is accessible after slow login', async () => {
         const inventory = poManager.getInventoryPage();
-        expect(await inventory.isPageTitleVisible()).toBe(true);
+        await inventory.expectPageTitleVisible();
         expect(await inventory.getProductCount()).toBe(6);
       });
     });
@@ -43,7 +43,7 @@ test.describe('User type behaviors', { tag: '@regression' }, () => {
       });
       await allure.step('Verify at least one product shows the wrong image', async () => {
         const inventory = poManager.getInventoryPage();
-        expect(await inventory.isPageTitleVisible()).toBe(true);
+        await inventory.expectPageTitleVisible();
         const mismatches = await inventory.getMismatchedProductImageCount(PRODUCT_IMAGE_SLUGS);
         expect(mismatches).toBeGreaterThan(0);
       });
@@ -62,7 +62,7 @@ test.describe('User type behaviors', { tag: '@regression' }, () => {
       });
       await allure.step('Verify inventory page shows 6 products', async () => {
         const inventory = poManager.getInventoryPage();
-        expect(await inventory.isPageTitleVisible()).toBe(true);
+        await inventory.expectPageTitleVisible();
         expect(await inventory.getProductCount()).toBe(6);
       });
     });
@@ -80,7 +80,7 @@ test.describe('User type behaviors', { tag: '@regression' }, () => {
       });
       await allure.step('Verify inventory page shows 6 products', async () => {
         const inventory = poManager.getInventoryPage();
-        expect(await inventory.isPageTitleVisible()).toBe(true);
+        await inventory.expectPageTitleVisible();
         expect(await inventory.getProductCount()).toBe(6);
       });
     });
