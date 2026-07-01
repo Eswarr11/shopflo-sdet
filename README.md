@@ -196,8 +196,8 @@ All 17 use the same `markKnownDefect()` pattern (see below). Breakdown: **4 UI**
 
 Source of truth (manual execution `Status: Failed`):
 
-- [SauceDemo test cases spreadsheet](https://docs.google.com/spreadsheets/d/1jK9cAb_C6vVrr4h8FTc8oyGkygmwP6a_Y01s3_4vydQ/edit?usp=sharing)
-- [FakeStoreAPI test cases spreadsheet](https://docs.google.com/spreadsheets/d/1NbomKcn3HD95l9FbgWy1MYpOcaYueGE7iSy4OHucJWE/edit?usp=sharing)
+- [SauceDemo test cases spreadsheet](https://docs.google.com/spreadsheets/d/1XE7UHifmlfsw0V3GHS--vtF56MzydYO-Um3rGlnnS5Y/edit?usp=sharing)
+- [FakeStoreAPI test cases spreadsheet](https://docs.google.com/spreadsheets/d/12o_1oSu8XOpDSC2Rcbb-rI5pm3y-5Vw33_zVDjjBe0Y/edit?usp=sharing)
 
 ### Why they show as **Passed** in CI and reports
 
