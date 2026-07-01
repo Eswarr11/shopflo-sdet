@@ -14,7 +14,7 @@ npm run test:smoke        # @smoke tagged tests
 npm run test:regression   # @regression tagged tests (full API + UI suite)
 npm run report            # Generate combined Allure + Playwright HTML reports
 npm run test:all:report   # Run full suite and generate combined reports
-npm run quality           # Typecheck + lint + format check (CI gate)
+npm run quality           # Typecheck + lint + format check (auto-runs Prettier --write if needed)
 ```
 
 **85 automated tests** total: **47 UI** + **38 API** across 23 spec files.
@@ -33,7 +33,7 @@ npm run lint          # ESLint
 npm run lint:fix      # Auto-fix lint issues
 npm run format        # Prettier write
 npm run format:check  # Prettier CI check
-npm run quality       # All three (used in CI)
+npm run quality       # Typecheck, ESLint, Prettier check (auto-formats locally; CI fails if fixes are needed)
 ```
 
 ---
@@ -180,11 +180,11 @@ All other FakeStoreAPI manual cases map **1:1** to a single automated test.
 
 ### Coverage status by manual `Status` column
 
-| Manual `Status` | Count | Automation |
-| --------------- | ----: | ---------- |
-| **Passed**      |    65 | Genuine pass |
-| **Failed**      |    17 | `markKnownDefect()` — 4 SauceDemo + 13 FakeStoreAPI |
-| **Total**       | **82** | **17** `@known-defect` tests |
+| Manual `Status` |  Count | Automation                                          |
+| --------------- | -----: | --------------------------------------------------- |
+| **Passed**      |     65 | Genuine pass                                        |
+| **Failed**      |     17 | `markKnownDefect()` — 4 SauceDemo + 13 FakeStoreAPI |
+| **Total**       | **82** | **17** `@known-defect` tests                        |
 
 ---
 
