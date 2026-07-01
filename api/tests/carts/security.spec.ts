@@ -22,7 +22,6 @@ test.describe('Cart — Security', { tag: ['@regression', '@known-defect'] }, ()
 
     test('Verify GET Carts With Malformed Bearer Token Returns Unauthorized', async () => {
       await markKnownDefect('FAKESTOREAPI_NO_AUTH');
-      console.log('Verify GET Carts With Malformed Bearer Token Returns Unauthorized');
 
       await withAuthToken('not.a.valid.jwt', async () => {
         await assertApiErrorStatus(() => carts.getAll(), 401);
