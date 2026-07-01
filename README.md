@@ -19,6 +19,8 @@ npm run quality           # Typecheck + lint + format check (CI gate)
 
 **85 automated tests** total: **47 UI** + **38 API** across 23 spec files.
 
+Manual test cases in [`docs/testcases/`](docs/testcases/): **82 rows** (**44** SauceDemo + **38** FakeStoreAPI). See [Test Case Traceability](#test-case-traceability) for how manual cases map to automation (including clubbed and split scenarios).
+
 Auth sessions for UI tests are generated automatically by `global-setup.ts` before the suite runs. Re-run tests anytime — auth files in `.auth/` are refreshed when older than 24 hours.
 
 Set `HEADED=true` in `.env` to run UI tests in headed mode locally (headless by default).
@@ -140,6 +142,49 @@ await this.actions.click(item.locator('button'), `Add to cart — ${productName}
 ### Extension Plan
 
 **Reporting:** Contract snapshots are committed JSON files — shape drift shows as a `git diff` in PRs. Allure tracks test history across runs.
+
+---
+
+## Test Case Traceability
+
+Manual cases live in [`docs/testcases/saucedemo_testcases.csv`](docs/testcases/saucedemo_testcases.csv) and [`docs/testcases/fakestoreapi_testcases.csv`](docs/testcases/fakestoreapi_testcases.csv). Every manual case is covered by automation; the automated count is higher because some scenarios are **split** into multiple tests for clearer failure isolation.
+
+| Source       | Manual cases (`docs/`) | Automated tests | Net delta | Notes                                    |
+| ------------ | ---------------------: | --------------: | --------: | ---------------------------------------- |
+| SauceDemo UI |                     44 |              47 |        +3 | 1 validation case split into 4 tests     |
+| FakeStoreAPI |                     38 |              38 |         0 | 1:1 mapping (1 manual case clubs 2 GETs) |
+| **Total**    |                 **82** |          **85** |    **+3** | All 82 manual intents covered            |
+
+### SauceDemo — split (1 manual → multiple automated)
+
+| Manual case (`docs/`)                            | Automated spec                |                                               Automated tests |
+| ------------------------------------------------ | ----------------------------- | ------------------------------------------------------------: |
+| Verify Mandatory Customer Information Validation | `checkout/validation.spec.ts` | **4** (missing first name, last name, postal code, all empty) |
+
+### SauceDemo — clubbed (multiple manual intents in one automated test)
+
+| Automated test                                          | Manual cases covered                                                                             |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `checkout/e2e.spec.ts` — E2E checkout for Standard User | End-to-end checkout **+** order-summary subtotal/tax checks (also isolated in `summary.spec.ts`) |
+| `checkout/cart-navigation.spec.ts`                      | Cart navigation from inventory **and** order confirmation (single flow)                          |
+
+All other SauceDemo manual cases map **1:1** to a single automated test (same title or direct equivalent).
+
+### FakeStoreAPI — clubbed (1 manual → 1 automated, multiple steps)
+
+| Manual case (`docs/`)                                 | Automated test                                                                          |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Verify Unauthenticated Client Can Read Any Cart By Id | `security.spec.ts` — asserts 401 for both `GET /carts/1` and `GET /carts/2` in one test |
+
+All other FakeStoreAPI manual cases map **1:1** to a single automated test.
+
+### Coverage status by manual `Status` column
+
+| Manual `Status` | Count | Automation |
+| --------------- | ----: | ---------- |
+| **Passed**      |    65 | Genuine pass |
+| **Failed**      |    17 | `markKnownDefect()` — 4 SauceDemo + 13 FakeStoreAPI |
+| **Total**       | **82** | **17** `@known-defect` tests |
 
 ---
 
